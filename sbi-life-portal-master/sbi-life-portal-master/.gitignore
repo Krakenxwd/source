@@ -1,0 +1,23 @@
+media/
+node_modules/
+.idea
+.DS_Store
+*.pyc
+*.*~
+*~
+*.env
+.pytest_cache
+.python-version
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+static/
+new.py
+
+__pycache__/

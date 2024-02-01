@@ -1,0 +1,101 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block head_title %}
+    Encryption Decryption
+{% endblock %}
+{% block extrastyle %}
+    <style>
+        .text-sky-500 {
+            color: #0ea5e9;
+        }
+
+        .text-slate-600 {
+            color: #475569;
+        }
+
+        .bg-slate-200 {
+            background: #e2e8f0;
+        }
+
+        .text-slate-900 {
+            color: #0f172a
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="mt-5 mb-2">
+
+
+        <div class=" align-middle inline-block min-w-full sm:px-6 lg:px-8 py-3 mt-2">
+            <div class="shadow sm:overflow-hidden sm:rounded-sm ">
+                <div class="bg-gray-50 px-4 py-4 text-left sm:px-6 mb-4">
+                    <h3 class="text-xl font-semibold leading-6 text-gray-900">Encryption Decrytion</h3>
+                </div>
+                <div class="flex">
+                    <!-- Text Encryption -->
+                    <div class="w-full md:w-1/2">
+                        <form role="form" class="form" id="encrypt-from">
+                            <h2 class="text-xl font-bold mb-4">Text Encryption</h2>
+                            <div class="mb-4">
+                                <label for="simpleOutputTxt" class="block text-sm font-medium text-gray-700">Enter any text
+                                    to be Encrypted</label>
+                                <textarea id="simpleOutputTxt" class="form-input mt-1 block w-full" rows="5"
+                                          placeholder="Enter plain text to be Encrypted"
+                                          ng-model="textEncryption.textToEncrypt" name="textToEncrypt"
+                                          data-gramm="false" wt-ignore-input="true"></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <button class="encrypt-btn bg-blue-700 flex items-center px-4 text-white font-medium text-sm rounded-md p-2"
+                                        name="hash" value="hash">
+                                    Encrypt
+                                </button>
+                            </div>
+                            <div>
+                                <label for="encOutputString" class="block text-sm font-medium text-gray-700">Encrypted
+                                    Output:</label>
+                                <textarea id="encOutputString" class="form-input mt-1 block w-full" rows="5"
+                                          placeholder="Result goes here" ng-model="textEncryption.encryptedText"
+                                          data-gramm="false" wt-ignore-input="true"></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Vertical Line -->
+                    <div class="hidden md:block w-px bg-gray-300 mx-4"></div>
+
+                    <!-- Text Decryption -->
+                    <div class="w-full md:w-1/2">
+                        <form role="form" class="form" id="decrypt-form">
+                            <h2 class="text-xl font-bold mb-4">Text Decryption</h2>
+                            <div class="mb-4">
+                                <label for="dinputString" class="block text-sm font-medium text-gray-700">Enter
+                                    encrypted text to Decrypt</label>
+                                <textarea id="dinputString" class="form-input mt-1 block w-full" rows="5"
+                                          ng-model="textEncryption.textToDecrypt"
+                                          placeholder="Enter text to be Decrypted" name="textToDecrypt"
+                                          data-gramm="false" wt-ignore-input="true"></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <button class="bg-blue-700 flex items-center px-4 text-white font-medium text-sm rounded-md p-2"
+                                        name="hash" value="hash" ng-click="decryptText()">
+                                    Decrypt
+                                </button>
+                            </div>
+                            <div>
+                                <label for="doutputString" class="block text-sm font-medium text-gray-700">Decrypted
+                                    Text:</label>
+                                <textarea id="doutputString" class="form-input mt-1 block w-full"
+                                          placeholder="Decrypted Text" ng-model="textEncryption.decryptedText" rows="5"
+                                          data-gramm="false" wt-ignore-input="true"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/master/encdecrypt.js' %}" csrf-token="{{ csrf_token }}"></script>
+{% endblock %}

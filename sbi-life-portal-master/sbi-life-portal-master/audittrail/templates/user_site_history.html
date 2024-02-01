@@ -1,0 +1,87 @@
+{% extends 'base/base.html' %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block head_title %}
+    User Site History
+{% endblock %}
+{% block left_aside %}
+    {% include 'left_side.html' with active_tab="users" %}
+{% endblock %}
+{% block extrastyle %}
+{% endblock %}
+{% block content %}
+{% include 'common/left_side.html' with active_tab='users' %}
+<main class="ml-16">
+    <section class="px-5 py-3 flex justify-between border-b bg-gray-50 items-center">
+        <div class="flex flex-col">
+            <span class="font-semibold text-xl">User History Logs</span>
+            <span class="text-sm font-medium text-gray-500">{{ user_email }}</span>
+        </div>
+    </section>
+    <section class="m-5 flex flex-col gap-2">
+        <div class="font-semibold">
+            <span>Filters</span>
+        </div>
+        <form class="p-5 border rounded-md flex gap-3 text-sm" method="GET" >
+            <span class="flex items-center flex-grow">
+                <span class="bg-white p-1.5 border border-r-0 rounded-md rounded-r-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                </span>                
+                <input type="text" name="search" id="search" class="search-input-filter p-1.5 outline-none border border-l-0 rounded-l-none rounded-md w-full" placeholder="Search" value="{{ request.GET.search }}">
+            </span>
+            <select name="request_type" id="is_active" class="px-5 py-1.5 w-32 flex-grow bg-white outline-none border rounded-md">
+                <option value="" selected>Request Type</option>
+                <option value="GET" {% if request.GET.request_type == "GET" %} selected {% endif %}>GET
+                </option>
+                <option value="POST" {% if request.GET.request_type == "POST" %} selected {% endif %}>POST
+                </option>
+            </select>
+            <button type="submit" class="flex px-4 gap-2 items-center py-2 text-sm bg-blue-700 text-white rounded-md">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                    </svg>
+                </span>
+                <span class="text-sm">Search</span>
+            </button>
+            {% if has_filter %}
+                <a href="{% url 'audittrail:user_site_history' user_id %}"
+                   class="text-sm py-2 justify-center px-4 flex items-center gap-2 rounded-md hover:bg-gray-300 bg-gray-200 border font-medium">
+                    <span>Clear</span>
+                </a>
+            {% endif %}
+        </form>
+    </section>
+    <section class="m-5 flex flex-col gap-2">
+        {% if total_entries > 0 %}
+            <div class="text-sm border border-b-0 rounded-md">
+                    {% render_table table %}
+            </div>
+        {% else %}
+            <div id="empty" class="rounded-md py-10 md:p-10 flex flex-col justify-center text-gray-400 items-center gap-3 text-center">
+                <div>
+                    <img src="{% static 'images/website.png' %}" alt="" class="w-24 opacity-30">
+                </div>
+                <div class="flex px-10 flex-col text-sm justify-center items-center gap-1">
+                    <span class="font-medium">No User History Logged.</span>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
+{% block javascript %}
+    <script>
+        window.onload = function check_status() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const searchTerm = urlParams.get('search');
+            const request_type = urlParams.get('request_type');
+
+            $('#search').val(searchTerm);
+            $('#request_type').val(request_type);
+        };
+    </script>
+{% endblock %}

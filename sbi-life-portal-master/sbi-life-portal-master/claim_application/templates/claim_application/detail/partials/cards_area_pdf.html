@@ -1,0 +1,493 @@
+{% load htmlfilter %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        @page {
+            size: A4;
+            margin: 1cm 1cm 1cm 1cm;
+        }
+
+        
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.static {
+  position: static;
+}
+
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
+.col-start-2 {
+  grid-column-start: 2;
+}
+
+.block {
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.grid {
+  display: grid;
+}
+
+.hidden {
+  display: none;
+}
+
+.h-5 {
+  height: 1.25rem;
+}
+
+.h-6 {
+  height: 1.5rem;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-24 {
+  width: 6rem;
+}
+
+.w-36 {
+  width: 9rem;
+}
+
+.w-5 {
+  width: 1.25rem;
+}
+
+.w-6 {
+  width: 1.5rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.grid-cols-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-5 {
+  gap: 1.25rem;
+}
+
+.self-center {
+  align-self: center;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
+.rounded-t-xl {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+.border {
+  border-width: 1px;
+}
+
+.border-b {
+  border-bottom-width: 1px;
+}
+
+
+.p-0 {
+  padding: 0px;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
+}
+
+.p-5 {
+  padding: 1.25rem;
+}
+
+.px-10 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.py-10 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.text-blue-500 {
+  --tw-text-opacity: 1;
+  color: rgb(59 130 246 / var(--tw-text-opacity));
+}
+
+.text-blue-600 {
+  --tw-text-opacity: 1;
+  color: rgb(37 99 235 / var(--tw-text-opacity));
+}
+
+.text-gray-400 {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+
+.text-green-500 {
+  --tw-text-opacity: 1;
+  color: rgb(34 197 94 / var(--tw-text-opacity));
+}
+
+.text-yellow-500 {
+  --tw-text-opacity: 1;
+  color: rgb(234 179 8 / var(--tw-text-opacity));
+}
+
+.underline {
+  text-decoration-line: underline;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+@media (min-width: 768px) {
+  .md\:p-10 {
+    padding: 2.5rem;
+  }
+}
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 3rem; width: 100%;" class="text-sm">
+        <table style="width: 100%;" border="1" cellspacing="0">
+          <caption></caption>
+          <thead>
+            <th class="p-2 font-medium">Policy No.</th>
+            <th class="p-2 font-medium">Document Type</th>
+            <th class="p-2 font-medium">Document Created At</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="p-2">{{ document.policy_number }}</td>
+              <td class="p-2">{{ document.master_type }}</td>
+              <td class="p-2">{{ document.created_at }}</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    {% if not document.pages.all|is_claimant_present %}
+    <div id="empty" class="rounded-md py-10 md:p-10 flex flex-col justify-center text-gray-400 items-center gap-3 text-center">
+        <div>
+            <img src="{% static 'images/page.png' %}" alt="" class="w-36 opacity-50">
+        </div>
+        <div class="flex px-10 flex-col text-sm justify-center items-center gap-1">
+            <span class="">No Matching Entities Found.</span>
+        </div>
+    </div>
+{% else %}
+    {% for claimant in document.claimant_set.all|dictsort:"type" %}
+        {% if claimant.type in 'Nominee' %}
+          {% for page in claimant.get_pages %}
+          {% with page_id=page.id %}
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                      <span class="uppercase font-semibold">{{ page.get_page_label.name }}</span>
+                      <span class="text-gray-400">Policy {{ claimant.type }} #{{ claimant.customer_id }}</span>
+                  </div>
+                  <div style="padding: 1rem 0;">
+                      <span style="color: rgb(234 179 8); display: flex; gap: 1rem;"
+                              class="">
+                              {% with success_score=page|get_page_validation_score:'success' failed_score=page|get_page_validation_score:'failed' %}
+                                  {% if failed_score %}
+                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                          class="w-6 h-6 text-yellow-500">
+                                          <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                      </svg>
+                                  <span style="margin-left: 1rem;">{{ failed_score }}</span>
+                                  {% elif success_score %}
+                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"></path>
+                                  </svg>
+                                  {% endif %}
+                              {% endwith %}
+                          </span>
+                  </div>
+              </div>
+              <section class="border rounded-md entity-card" id="policy_{{ claimant.type }}_{{ claimant.id }}">
+                  
+                  <table style="width: 100%;" border="1" cellspacing="0">
+                      <caption></caption>
+                      <thead>
+                          <th class="p-3 border">Field Name</th>
+                          <th class="p-3 border">SBIL Data</th>
+                          <th class="p-3 border bg-blue-50" style="background-color: rgb(239 246 255) !important;">Extracted Data</th>
+                          <th class="p-3 border">Score</th>
+                          <th class="p-3 border">Validation</th>
+                      </thead>
+                      <tbody>
+                          {% for master_field in page.get_active_fields %}
+                          <tr>
+                              {% with data_type=master_field.data_type field_code=master_field.code %}
+                              {% if field_code not in "full,front,back" %}
+                              <td class="p-3 border">{{ master_field.name }}</td>
+                              {% with claimant_field=master_field|get_claimant_field_based_on_master_field:page %}
+                              {% if claimant_field %}
+                              <td class="p-3 border">
+                                  {% if claimant_field.text %}
+                                  {{ claimant_field.text }}{% else %}{% endif %}
+                              </td>
+                              {% else %}
+                              <td class="p-3 border">
+                              </td>
+                              {% endif %}
+                              {% endwith %}
+                              
+                              {% with pagefield=master_field|get_page_field_based_on_master_field:page %}
+                              {% if pagefield %}
+                              {% with original_pagefield_page_num=pagefield.original_page_number|format_value_text %}
+                              <td class="p-3 border bg-blue-50" style="background-color: rgb(239 246 255) !important;">
+                                  {% if data_type == 'date' %}
+                                  {{ pagefield.value_date|date:"d/m/Y" }}
+                                  {% elif data_type == 'amount' %}
+                                  {{ pagefield.value_amount }}
+                                  {% elif data_type == 'boolean' %}
+                                  {{ pagefield.value_boolean }}
+                                  {% elif data_type == 'image' %}
+                                  {% with face_url=pagefield|get_image_url %}
+                                  {% if face_url %}
+                                  <div>
+                                      <img src="{{ face_url }}" alt="" class="w-24">
+                                  </div>
+                                  {% else %}
+                                  <div>
+                                      <img src="{% static 'images/placeholder.jpg' %}" alt="" class="w-24">
+                                  </div>
+                                  {% endif %}
+                                  {% endwith %}
+                                  {% elif data_type == 'text' and pagefield.is_multi_line %}
+                                  {% if pagefield.value_text %}
+                                  {{ pagefield.value_text }}{% else %}{% endif %}
+                                  {% else %}
+                                  {{ pagefield.text }}
+                                  {% endif %}
+                              </td>
+                              {% endwith %}
+                              {% else %}
+                              <td class="p-3 border bg-blue-50" style="background-color: rgb(239 246 255) !important;"></td>
+                              {% endif %}
+                              {% endwith %}
+                              
+                              {% with score_field=master_field|get_score_field_based_on_master_field:page %}
+                              {% if score_field %}
+                              <td class="p-3 border">
+                                  {{ score_field.score|format_value_text }}
+                              </td>
+                              {% else %}
+                              <td class="p-3 border"></td>
+                              {% endif %}
+                              {% endwith %}
+                              
+                              <td class="p-3 border">
+                                  <div class="flex justify-around">
+                                    {% with field_validations=master_field|get_field_validation:page %}
+                                          {% if field_validations %}
+                                              {% if field_validations|is_all_mandatory_validation_flag_true %}
+                                              <span class="hover:scale-110">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                                      class="w-6 h-6 text-green-500">
+                                                      <path fill-rule="evenodd"
+                                                          d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                                          clip-rule="evenodd"/>
+                                                  </svg>
+                                              </span>
+                                              {% else %}
+                                                  <span class="hover:scale-110">
+                                                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-yellow-500">
+                                                          <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                                      </svg>
+                                                  </span>
+                                              {% endif %}
+                                          {% endif %}
+                                      {% endwith %}
+                                  </div>
+                              </td>
+                              {% endif %}
+                              {% endwith %}
+                          </tr>
+                              {% endfor %}
+                      </tbody>
+                  </table>
+              </section>
+          {% endwith %}
+      {% endfor %}
+        {% endif %}
+    {% endfor %}
+
+    <!-- Claim Form -->
+    {% for page in document.pages.all|get_claimform_page %}
+        <div style="padding: 2rem 0">
+          <span class="uppercase font-semibold">{{ page.get_page_label.name }}</span>
+        </div>
+        {% with page_id=page.id %}
+          <table style="width: 100%;" border="1" cellspacing="0">
+            <caption></caption>
+            <thead>
+                <th class="p-3 border">Field Name</th>
+                <th class="p-3 border">SBIL Data</th>
+                <th class="p-3 border bg-blue-50" style="background-color: rgb(239 246 255) !important;">Extracted Data</th>
+                <th class="p-3 border">Score</th>
+                <th class="p-3 border">Validation</th>
+            </thead>
+            <tbody>
+              {% for master_field in page.get_active_fields %}
+                {% with data_type=master_field.data_type field_code=master_field.code %}
+                  {% if field_code not in "full,front,back" %}
+                    <tr>
+                      <td class="p-3 border">
+                        {{ master_field.name }}
+                      </td>
+                      <td class="p-3 border"></td>
+                      <td class="p-3 border">
+                        {% with pagefield=master_field|get_page_field_based_on_master_field:page %}
+                          {% if pagefield %}
+                              {% with original_pagefield_page_num=pagefield.original_page_number|format_value_text %}
+                                  {% if data_type == 'date' %}
+                                      {{ pagefield.value_date|date:"d/m/Y" }}
+                                  {% elif data_type == 'amount' %}
+                                      {{ pagefield.value_amount }}
+                                  {% elif data_type == 'boolean' %}
+                                      {{ pagefield.value_boolean }}
+                                  {% elif data_type == 'image' %}
+                                      {% with face_url=pagefield|get_image_url %}
+                                          {% if face_url %}
+                                          <img src="{{ face_url }}" alt="" class="w-24">
+                                          {% else %}
+                                                <img src="{% static 'images/placeholder.jpg' %}"
+                                                      alt=""
+                                                      class="w-24">
+                                          {% endif %}
+                                      {% endwith %}
+                                  {% elif data_type == 'text' and pagefield.is_multi_line %}
+                                      {% if pagefield.value_text %}
+                                          {{ pagefield.value_text }}{% else %}{% endif %}
+                                  {% else %}
+                                      {{ pagefield.text }}
+                                  {% endif %}
+                            {% endwith %}
+                          {% else %}
+                              <td></td>
+                          {% endif %}
+                          {% endwith %}
+                      </td>
+                      <td class="p-3 border"></td>
+                    </tr>
+                  {% endif %}
+                {% endwith %}
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endwith %}
+    {% endfor %}
+{% endif %}
+</body>
+</html>

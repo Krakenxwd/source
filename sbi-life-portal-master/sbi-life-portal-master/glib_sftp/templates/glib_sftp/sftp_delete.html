@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+{% load render_table from django_tables2 %}
+{% block left_aside %}
+    {% include 'left_side.html' with active_tab="sftp" %}
+{% endblock %}
+
+{% block content %}
+    <div class="mt-5 mb-2">
+        <div class="flex flex-col mt-2">
+            <div class="overflow-x-auto">
+                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                    <div class="overflow-hidden shadow">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="bg-gray-100 px-4 py-3 sm:px-6 flex justify-between ">
+                                <h3 class="text-lg leading-6 font-medium text-gray-700" id="modal-title">
+                                    <div>Delete Sftp Configuration</div>
+                                </h3>
+                            </div>
+                            <div class="bg-white px-4 pt-2 pb-4 sm:p-6 sm:pt-2 sm:pb-5">
+                                <div class="space-y-4 divide-y divide-gray-200">
+                                    <div class=" grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
+                                        <div class="sm:col-span-6">
+                                            <div class="mt-1">
+                                                <p>Are you sure you want to delete Sftp : <b>{{ object.url }}</b>  ?</p>
+                                            </div>
+                                        </div>
+                                        <div class="sm:col-span-6">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="submit" class="btn btn-warning" value="Submit">
+                                    <span class="oi oi-check"></span> Confirm
+                                </button>
+                                <a type="submit" class="btn btn-light mr-3"
+                                   href="{% url 'glib_sftp:sftp' %}">
+                                    <span class="oi oi-x"></span> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

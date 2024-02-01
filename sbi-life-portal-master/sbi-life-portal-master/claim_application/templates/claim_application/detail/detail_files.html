@@ -1,0 +1,15 @@
+{% load static %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="">
+    <section class="p-5">
+        {% render_table table %}
+    </section>
+</main>
+{% endblock %}

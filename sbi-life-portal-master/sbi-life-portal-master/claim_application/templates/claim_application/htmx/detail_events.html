@@ -1,0 +1,44 @@
+{% load static %}
+{% load htmlfilter %}
+
+{% with records=document.logs.all %}
+    <main class="max-w-screen flex flex-col gap-4">
+        <section class="">
+        {% if records %}
+            <div class="overflow-hidden bg-white rounded-md border">
+                <div class="px-4 py-3 sm:px-6">
+                    <div class="flow-root">
+                            <ul role="list" class="-mb-8">
+                                {% for log in records|get_last_document_logs %}
+                                    <li>
+                                        <div class="relative pb-8">
+                                            <span class="absolute left-3 top-3 -ml-px h-full w-0.5 bg-gray-200"
+                                                aria-hidden="true"></span>
+                                            <div class="relative flex space-x-3">
+                                                {% include 'claim_application/detail/partials/event_partial.html' with event_type=log.level %}
+                                                <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1">
+                                                    <div>
+                                                        <p class="text-xs font-medium text-gray-500">{{ log.code }}</p>
+                                                        <p class="text-xs text-gray-500">{{ log.message }}</p>
+                                                    </div>  
+                                                    <div class="whitespace-nowrap text-right text-xs text-gray-500">
+                                                        <time>{{ log.created_at|date:'d/m/Y H:i:s' }}</time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="w-full flex flex-col items-center gap-5 p-10 opacity-40">
+                <img src="{% static 'images/river-trail.png' %}" alt="" class="w-20">
+                <span>No events trail found.</span>
+            </div>
+        {% endif %}
+        </section>
+    </main>
+{% endwith %}

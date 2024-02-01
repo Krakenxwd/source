@@ -1,0 +1,30 @@
+{% load htmlfilter %}
+{% for claimant in document.claimant_set.all|dictsort:"type" %}
+    <div class="flex flex-col gap-2 text-xs">
+        {% if claimant.type == 'Holder' %}
+            <div class="flex flex-col gap-1">
+                <span class="text-sm font-medium">Policy Holder <span class="text-gray-500">ID {{ claimant.customer_id }}</span></span>
+                <div class="grid grid-cols-2 gap-3 border rounded-md p-4">
+                    {% for claimant_field in claimant.claimant_fields.all %}
+                        <div class="flex flex-col">
+                            <span class="font-medium capitalize">{{ claimant_field.digital_master_field.name }}</span>
+                            <span class="capitalize text-gray-600">{{ claimant_field.text|filter_text }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="flex flex-col gap-1">
+                <span class="text-sm font-medium">Policy Nominee <span class="text-gray-500">ID {{ claimant.customer_id }}</span></span>
+                <div class="grid grid-cols-2 gap-3 border rounded-md p-4">
+                    {% for claimant_field in claimant.claimant_fields.all %}
+                        <div class="flex flex-col">
+                            <span class="font-medium capitalize">{{ claimant_field.digital_master_field.name }}</span>
+                            <span class="capitalize text-gray-600">{{ claimant_field.text|filter_text }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}

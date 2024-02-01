@@ -1,0 +1,74 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+{% block head_title %}
+    Field Scores
+{% endblock %}
+{% block extrastyle %}
+    <link rel="stylesheet" href="{% static 'css/user_master.css' %}">
+{% endblock %}
+{% block content %}
+    {% include 'common/left_side.html' with active_tab='settings' %}
+    <main class="flex flex-col gap-5 max-w-screen ml-16">
+        <section class="px-5 py-3 flex justify-between border-b bg-gray-50 items-center">
+            <div class="flex flex-col">
+                <span class="font-semibold text-xl">Change Scoring Threshold</span>
+                <span class="text-xs text-gray-500">Change the scoring threshold of the available active fields.</span>
+            </div>
+        </section>
+        <section class="px-5 flex flex-col gap-2">
+            <div class="font-semibold">
+                <span>Filters</span>
+            </div>
+            <form class="p-5 border rounded-md flex flex-col md:flex-row gap-3 text-sm" method="GET" >
+                <span class="flex items-center flex-grow">
+                    <span class="bg-white p-1.5 border border-r-0 rounded-md rounded-r-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </span>                
+                    <input type="text" name="search" id="search" class="search-input-filter p-1.5 outline-none border border-l-0 rounded-l-none rounded-md w-full" placeholder="Search" value="{{ request.GET.search }}">
+                </span>
+                <select name="is_active" id="is_active" class="px-5 py-1.5 w-full md:w-32 flex-grow bg-white outline-none border rounded-md">
+                    <option value="" selected>Active/Inactive</option>
+                    <option value=1 {% if request.GET.is_active == "1" %} selected {% endif %}>Active
+                    </option>
+                    <option value=0 {% if request.GET.is_active == "0" %} selected {% endif %}>Inactive
+                    </option>
+                </select>
+                <button type="submit" class="flex px-4 gap-2 justify-center items-center py-2 text-sm bg-blue-700 text-white rounded-md">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    <span class="text-sm font-medium">Search</span>
+                </button>
+                {% if has_filter %}
+                    <a href="{% url 'claim_application:settings.field_scores' %}"
+                       class="text-sm py-2 justify-center px-4 flex items-center gap-2 rounded-md hover:bg-gray-300 bg-gray-200 border font-medium">
+                        <span>Clear</span>
+                    </a>
+                {% endif %}
+            </form>
+        </section>
+        <section class="px-5 mb-5">
+            <div class="text-sm mb-2 text-gray-500">Showing {{ table.page.start_index }} to {{ table.page.end_index }} of {{ table.paginator.count }} field scores.</div>
+            {% render_table table %}
+            {% if has_filter and table.paginator.count == 0 %}
+                <div id="empty" class="rounded-md py-10 md:p-10 flex flex-col justify-center text-gray-400 items-center gap-3 text-center">
+                    <div>
+                        <img src="{% static 'images/leaf.png' %}" alt="" class="w-36 opacity-40">
+                    </div>
+                    <div class="flex px-10 flex-col text-sm justify-center items-center gap-1">
+                        <span class="font-medium">No records found, matching your query.</span>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/claim_application/settings/score_update.js' %}"></script>
+{% endblock %}

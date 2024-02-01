@@ -1,0 +1,180 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block head_title %}
+    Upload Files
+{% endblock %}
+
+{% block content %}
+    {% include 'common/left_side.html' with active_tab='upload' %}
+    <main class="flex flex-col items-center gap-5 max-w-screen ml-16">
+        <section class="bg-gray-50 w-full p-5 border-b flex flex-col">
+            <span class="font-semibold text-xl">Create New Document Package</span>
+            <span class="text-xs text-gray-500">Start creating a new document package by uploading all the required documents.</span>
+        </section>
+
+        <form method="POST" enctype="multipart/form-data" id="uploadform"
+              class="w-full px-5 md:px-0 flex flex-col items-center gap-7">
+            <section class="flex flex-col gap-3 w-full lg:w-3/4 rounded-md p-5 border">
+                <div class="flex gap-1 flex-col">
+                    <div>
+                        <span class="font-medium text-sm">Enter Policy Number</span>
+                    </div>
+                    <div>
+                        {% render_field form.policy_number class="w-full outline-none bg-white p-2 border rounded-md" %}
+                    </div>
+                </div>
+                <div class="flex gap-1 flex-col">
+                    <div>
+                        <span class="font-medium text-sm">Document Type</span>
+                    </div>
+                    <div>
+                         {% render_field form.document_type class="w-full outline-none bg-white p-2 border rounded-md" %}
+                    </div>
+                </div>
+            </section>
+            <section class="flex flex-col w-full items-end lg:w-3/4 rounded-md" id="formset-form">
+                {% csrf_token %}
+                {{ claim_formset.management_form }}
+                {% for form in claim_formset %}
+                    <div class="relative claim-formset flex flex-col gap-5 rounded-md w-full border my-3 p-5">
+                        <span class="font-semibold">Policy Entity</span>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">Entity Type</span>
+                            {% render_field form.entity_type class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex flex-grow flex-col gap-1">
+                                <span class="text-sm font-medium">Customer ID</span>
+                                {% render_field form.customer_id class="customer-id min-w-full outline-none bg-white p-2 border rounded-md" %}
+                            </div>
+                            <div class="flex flex-col flex-grow gap-1">
+                                <span class="text-sm font-medium">Document Number</span>
+                                {% render_field form.number class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">Name</span>
+                            {% render_field form.name class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-grow flex flex-col gap-1">
+                                <span class="text-sm font-medium">DOB</span>
+                                {% render_field form.dob class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                            </div>
+                            <div class="flex-grow flex flex-col gap-1">
+                                <span class="text-sm font-medium">Gender</span>
+                                {% render_field form.gender class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">Address</span>
+                            {% render_field form.address class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">Bank Name</span>
+                            {% render_field form.name_of_bank class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">Account Number</span>
+                            {% render_field form.account_no class="min-w-full outline-none bg-white p-2 border rounded-md" %}
+                        </div>
+                    </div>
+                    <button type="button"
+                            class="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 flex items-center gap-1 mt-1"
+                            id="add-form">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.7" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>                              
+                            </span>
+                        <span class="text-sm font-medium">Add Policy Entity</span>
+                    </button>
+                {% endfor %}
+            </section>
+            <section class="flex flex-col gap-3 w-full lg:w-3/4 rounded-md p-5 border mb-20">
+                <div>
+                    <span class="font-semibold">Upload Files</span>
+                </div>
+                <label id="uploadBox"
+                       class="border border-dashed cursor-pointer hover:bg-blue-50 hover:text-blue-500 hover:border-blue-500 border-2 rounded-md p-10 flex flex-col justify-center text-gray-400 items-center gap-3">
+                    <div>
+                        <img src="{% static 'images/paper.png' %}" alt="" class="w-28 opacity-40">
+                    </div>
+                    <div class="flex lg:px-10 flex-col justify-center items-center gap-3 text-center">
+                        <span class="font-bold">Upload Files</span>
+                        <span class="text-sm">No files chosen. <span
+                                class="font-medium underline">Choose Files</span></span>
+                        {% render_field form.file class+="hidden" %}
+                    </div>
+                </label>
+                <label id="choose-file"
+                       class="border border-dashed cursor-pointer hover:bg-blue-50 hover:text-blue-500 hover:border-blue-500 border-2 rounded-md p-10 flex justify-center text-gray-400 items-center gap-2"
+                       for="id_file" style="display: none">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="w-8 h-8">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="flex flex-col justify-center items-center gap-3">
+                        <span class="">Add more files.</span>
+                    </div>
+                </label>
+                <div class="flex flex-col text-center lg:flex-row lg:justify-between text-sm text-gray-400">
+                    <span>Supported Formats: .png, .jpeg, .jpg, .tiff, .tif or .pdf</span>
+                    <span>Maximum File Size: 100MB</span>
+                </div>
+                <div id="empty" class="rounded-md p-10 flex flex-col justify-center text-gray-400 items-center gap-3">
+                    <div>
+                        <img src="{% static 'images/upload-file.png' %}" alt="" class="w-42">
+                    </div>
+                    <div class="flex px-10 flex-col justify-center items-center gap-3">
+                        <span class="font-bold">No Files Selected.</span>
+                    </div>
+                </div>
+                <div class="mt-4 pr-3 flex flex-col gap-3 max-h-96 overflow-y-auto" id="gallery">
+                </div>
+                <div class="flex justify-end w-full gap-3 rounded-md">
+                    <button id="cancel" class="bg-gray-100 py-2 px-4 rounded-md hover:bg-gray-200 hidden">Cancel
+                    </button>
+                    <button id="submit-btn" type="submit"
+                            class="final-submit-button bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800">Create Document
+                        Package
+                    </button>
+                </div>
+                <div id="file-template" class="hidden">
+                    <div id="target-block"
+                         class="flex items-center flex-wrap w-full p-3 border justify-between text-sm rounded-md hover:bg-gray-50">
+                        <div class="flex items-center gap-3 font-medium">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                                </svg>
+                            </span>
+                            <span id="file-name" class="w-64 whitespace-nowrap overflow-hidden text-ellipsis"></span>
+                            <span id="file-size" class="font-normal text-gray-500"></span>
+                        </div>
+                        <div class="flex gap-3 items-center">
+                            <span class="p-1 hover:bg-red-500 hover:text-white rounded-full cursor-pointer remove-file">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </form>
+    </main>
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/claim_application/upload/upload.js' %}"></script>
+{% endblock %}

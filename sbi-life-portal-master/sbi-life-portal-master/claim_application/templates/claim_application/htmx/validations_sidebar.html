@@ -1,0 +1,133 @@
+{% load static %}
+{% load htmlfilter %}
+{% if not document.pages.all|is_claimant_present %}
+    <div id="empty" class="rounded-md py-10 md:p-10 flex flex-col justify-center text-gray-400 items-center gap-3 text-center">
+        <div>
+            <img src="{% static 'images/stamp.png' %}" alt="" class="w-36 opacity-40">
+        </div>
+        <div class="flex px-10 flex-col text-sm justify-center items-center gap-1">
+            <span class="">No Validations Found.</span>
+        </div>
+    </div>
+{% else %}
+    <div class="bg-white">
+        <div class="overflow-x-auto border-b border-gray-200">
+            <div class="flex justify-between items-center pr-3">
+                <nav class="flex gap-1 space-x-4 px-4" aria-label="Tabs">
+                    <button
+                    class="flex items-center gap-1.5 validation-tab validation-tab-active"
+                    aria-current="page" id="field-validations-button">
+                        <span class="hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-red-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </span>
+                        Field Validations
+                    </button>
+                    <button
+                    class="flex items-center gap-1.5 validation-tab"
+                    aria-current="page" id="page-validations-button">
+                        <span class="hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-red-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </span>
+                        Page Validations
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="px-5 pb-5" id="field-wise-validations-modal">
+        {% for claimant in document.claimant_set.all|dictsort:"type" %}
+            {% for page in claimant.get_pages %}
+                {% with page_id=page.id %}
+                    <section class="rounded-md entity-card">
+                        <div class="flex items-center justify-between py-3">
+                            <div class="flex gap-2">
+                                <span class="uppercase font-semibold">{{ page.get_page_label.name }}</span>
+                                <span class="text-gray-400">Policy {{ claimant.type }} #{{ claimant.customer_id }}</span>
+                            </div>
+                        </div>
+                        <div class="visible border rounded-md px-3">
+                            <div class="flex flex-col gap-5 text-sm">
+                                <div class="grid grid-cols-4 items-center justify-center">
+                                    <div class="p-3 border-b h-full text-xs font-medium flex items-center">Field Name</div>
+                                    <div class="p-3 border-b h-full text-xs font-medium flex items-center">Validation Code</div>
+                                    <div class="p-3 border-b h-full text-xs font-medium flex items-center">Reason</div>
+                                    <div class="p-3 border-b h-full text-xs font-medium flex items-center">Status</div>
+                                    {% for master_field in page.get_active_fields %}
+                                            {% with field_validations=master_field|get_field_validation:page %}
+                                                {% if field_validations.exists %}
+                                                    {% for validation in field_validations %}
+                                                        <div class="p-3 {% if not master_field == page.get_active_fields.last %}border-b{% endif %} h-full text-xs font-medium flex items-center">{{ master_field.name }}</div>
+                                                        <div class="p-3 {% if not master_field == page.get_active_fields.last %}border-b{% endif %} h-full text-xs font-medium flex items-center">{{ validation.rule }}</div>
+                                                        <div class="p-3 {% if not master_field == page.get_active_fields.last %}border-b{% endif %} h-full text-xs text-gray-500 flex items-center">{{ validation.reason }}</div>
+                                                        <div class="p-3 {% if not master_field == page.get_active_fields.last %}border-b{% endif %} h-full text-xs flex gap-1 items-center">
+                                                            {% if validation.status in 'success' %}
+                                                            <span class="py-1 px-3 rounded font-medium bg-green-50 text-green-600">
+                                                                Success
+                                                            </span>
+                                                            {% else %}
+                                                            <span class="py-1 px-3 rounded font-medium bg-yellow-50 text-yellow-600">
+                                                                Warning
+                                                            </span>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endwith %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% endwith %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+    <div class="px-5 flex flex-col gap-3 pb-5 hidden" id="page-wise-validations-modal">
+        {% for claimant in document.claimant_set.all|dictsort:"type" %}
+            <div class="flex flex-col gap-3">
+                {% for page in claimant.get_pages %}
+                    <section class="rounded-md entity-card flex flex-col gap-2">
+                        <div class="flex gap-2">
+                            <span class="uppercase font-semibold">{{ page.get_page_label.name }}</span>
+                            <span class="text-gray-400">Policy {{ claimant.type }} #{{ claimant.customer_id }}</span>
+                        </div>
+                        <div class="visible border rounded-md px-3">
+                            <div class="grid grid-cols-4 items-center justify-center" id="main-grid">
+                                <div class="p-3 border-b h-full text-xs font-medium flex items-center">Validation Code</div>
+                                <div class="p-3 border-b h-full col-span-2 text-xs font-medium flex items-center">Reason</div>
+                                <div class="p-3 border-b h-full text-xs font-medium flex items-center">Status</div>
+                                {% with page_validations=page|get_page_validation %}
+                                    {% if page_validations.exists %}
+                                        {% for page_validation in page_validations %}
+                                            <div class="p-3 {% if not page_validation == page_validations.last %}border-b{% endif %} h-full text-xs font-medium flex items-center">{{ page_validation.rule }}</div>
+                                            <div class="p-3 {% if not page_validation == page_validations.last %}border-b{% endif %} h-full col-span-2 text-xs text-gray-500 flex items-center">{{ page_validation.reason }}</div>
+                                            <div class="p-3 {% if not page_validation == page_validations.last %}border-b{% endif %} h-full text-xs flex gap-1 items-center">
+                                                {% if page_validation.status in 'success' %}
+                                                    <span class="py-1 px-3 rounded font-medium bg-green-50 text-green-600">
+                                                        Success
+                                                    </span>
+                                                {% else %}
+                                                    <span class="py-1 px-3 rounded font-medium bg-yellow-50 text-yellow-600">
+                                                        Warning
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </section>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% block javascript %}
+<script src="{% static 'js/claim_application/detail/htmx_validations_partial.js' %}"></script>
+{% endblock %}

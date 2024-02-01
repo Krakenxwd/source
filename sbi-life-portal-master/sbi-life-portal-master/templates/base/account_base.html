@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html >
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <title>{% block title %}{% endblock %}</title>
+    {% block extra_head %}
+    {% endblock %}
+    {% block extrastyle %}
+    {% endblock %}
+  </head>
+  <body>
+    {% include 'common/notification.html' %}
+    {% include 'common/form_errors.html' %}
+    {% block body %}
+        {% block content %}
+        {% endblock %}
+    {% endblock %}
+    {% block extra_body %}
+    {% endblock %}
+  </body>
+  <script src="{% static 'js/common/notification_modal.js' %}"></script>
+  <script src="{% static 'js/common/form_field_modal.js' %}"></script>
+</html>

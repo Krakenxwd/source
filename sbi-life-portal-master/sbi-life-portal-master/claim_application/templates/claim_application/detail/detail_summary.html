@@ -1,0 +1,133 @@
+{% extends 'base/base.html' %}
+{% load htmlfilter %}
+{% load static %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+{% block head_title %}
+    Summary
+{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/annotation.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include 'common/left_side.html' with active_tab='documents' %}
+<main class="flex h-screen flex-col md:!ml-16">
+    <section class="">
+        {% include 'claim_application/detail/partials/header.html' %}
+        {% if document.status in 'completed' %}
+            {% include 'claim_application/detail/partials/tabs.html' %}
+        {% endif %}
+    </section>
+    {% if document.status in 'completed' %}
+        <section class="grid grid-cols-1 lg:grid-cols-7 h-full overflow-hidden">
+            <div class="h-full overflow-hidden overflow-y-auto flex flex-col lg:col-span-4">
+                {% include 'claim_application/detail/partials/document_actions.html' with document=document %}
+                <section class="flex flex-col gap-5 p-5 h-full overflow-y-auto" id="cards_area">
+                    {% include 'claim_application/detail/partials/cards_area.html' with document=document %}
+                </section>
+            </div>
+                <section id="pdf-container" class="h-full overflow-y-auto bg-gray-100 lg:col-span-3"></section>
+        </section>
+    {% elif document.status in 'processing' %}
+    <section class="p-10 w-full gap-5 flex items-center justify-center flex-col">
+        <span class="bg-gray-100 rounded-md p-2 border">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-500 cog">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.063 16.658l.26-1.477m2.605-14.772l.26-1.477m0 17.726l-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205L12 12m6.894 5.785l-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864l-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495" />
+            </svg>
+        </span>
+        <span class="text-sm text-gray-500">This document is currently processing. Please wait while we process it.</span>
+    </section>
+    {% elif document.status in 'queued' %}
+        <section class="p-10 w-full gap-5 flex items-center justify-center flex-col">
+            <span class="bg-gray-100 rounded-md p-2 border">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </span>
+            <span class="text-sm text-gray-500">This document is queued for processing. Please wait while queue clears up.</span>
+        </section>
+    {% else %}
+        <section>
+            {% include 'claim_application/detail/partials/document_actions.html' with document=document %}
+            <div class="p-10 w-full gap-5 flex items-center justify-center flex-col">
+                <span class="bg-gray-100 rounded-md p-2 border">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-500">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                    </svg>                  
+                </span>
+                <span class="text-sm text-gray-500">There was an error processing this document or it might have been deleted.</span>
+            </div>
+        </section>
+    {% endif %}
+    <!-- Policy Events Details -->
+    <section class="files-slide fixed overflow-y-auto right-0 top-0 w-full  lg:w-1/2 shadow-xl h-screen z-10 bg-white transform transition ease-in-out duration-500 sm:duration-700 translate-x-full" id="validation-modal" style="z-index: 123456;">
+        <div class="flex justify-between items-center p-5 border-b bg-gray-50">
+            <span class="font-medium text-lg">Events Summary</span>
+            <span class="p-1 rounded-full hover:bg-gray-200 cursor-pointer close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>                      
+            </span>
+        </div>
+        <div class="overflow-hidden text-sm p-5 bg-white rounded-md" id="detail-events-replace-div">
+            {% include 'claim_application/detail/partials/detail_events_shimmer_loader.html' %}
+        </div>
+    </section>
+    <!-- Policy Files Details -->
+    <section class="files-slide overflow-y-auto fixed right-0 top-0 w-full lg:w-3/5 shadow-xl h-screen z-10 bg-white transform transition ease-in-out duration-500 sm:duration-700 translate-x-full" id="files-modal" style="z-index: 123456;">
+        <div class="flex justify-between items-center p-5 border-b bg-gray-50">
+            <span class="flex gap-2 items-center">
+                <span class="font-medium text-lg">Files</span>
+                <span class="text-blue-600 bg-blue-50 border w-8 flex items-center justify-center h-8 font-medium rounded-full text-sm">{{ files_count }}</span>
+            </span>
+            <span class="p-1 rounded-full hover:bg-gray-200 cursor-pointer close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>                      
+            </span>
+        </div>
+        <div id="files-replace-div"></div>
+    </section>
+    <!-- Policy Entity Details -->
+    <section class="policy-entity-slide overflow-y-auto fixed right-0 top-0 w-full lg:w-2/6 shadow-2xl h-screen z-10 bg-white transform transition ease-in-out duration-500 sm:duration-700 translate-x-full" id="policy-entity-modal" style="z-index: 123456;">
+        <div class="flex justify-between items-center p-5 border-b bg-gray-50">
+            <span class="flex gap-2 items-center">
+                <span class="font-medium text-lg">Policy Entities</span>
+            </span>
+            <span class="p-1 rounded-full hover:bg-gray-200 cursor-pointer close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>                      
+            </span>
+        </div>
+        <div id="policy-entity-replace-div" class="text-sm p-5 flex flex-col gap-3">
+            {% include 'claim_application/detail/partials/digital_data_shimmer_loader.html' %}
+        </div>
+    </section>
+    <!-- Validations Sidebar -->
+    <section class="validations-slide overflow-y-auto fixed right-0 top-0 w-full lg:w-1/2 shadow-2xl h-screen z-10 bg-white transform transition ease-in-out duration-500 sm:duration-700 translate-x-full" id="page-validation-modal" style="z-index: 123456;">
+        <div class="flex justify-between items-center p-5 border-b bg-gray-50">
+            <span class="flex gap-2 items-center">
+                <span class="font-medium text-lg">Validations</span>
+            </span>
+            <span class="p-1 rounded-full hover:bg-gray-200 cursor-pointer close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>                      
+            </span>
+        </div>
+        <div id="validations-div" class="text-sm flex flex-col gap-3">
+            {% include 'claim_application/detail/partials/validations_shimmer_loader.html' %}
+        </div>
+    </section>
+</main>
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/annotation.js' %}"></script>
+    <script src="{% static 'js/claim_application/detail/detail_summary.js' %}" preprocessed-file=""
+    file-url="{% if document.file %}{{ document.file.url|safe }}{% endif %}" document-id="{{document.id}}" page-num="{{page_num}}"></script>
+    <script src="{% static 'js/claim_application/detail/detail_header.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+{% block head_title %}
+    Audit Report
+{% endblock %}
+{% block content %}
+    {% include 'common/left_side.html' %}
+    <main class="ml-16">
+        <section class="bg-gray-50 w-full p-5 border-b flex flex-col">
+            <span class="font-semibold text-xl">Audit Report</span>
+            <span class="text-xs text-gray-500">Start creating a new document package by uploading all the required documents.</span>
+        </section>
+        <section class="p-5">
+            {% for audit in object_list %}
+                {% with display_dict=audit.items %}
+                <div class="flex flex-col">
+                    <div class="my-5">
+                    {% for key,value in display_dict %}
+                        {{ key }} - {{ value }} <br>
+                    {% endfor %}
+                    </div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        </section>
+    </main>
+{% endblock %}
+{% block javascript %}
+{% endblock %}

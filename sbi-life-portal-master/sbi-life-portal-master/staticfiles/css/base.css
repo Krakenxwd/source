@@ -1,0 +1,182 @@
+* {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+@font-face {
+    font-family: 'Inter';
+    src: url("../assets/Inter-VariableFont_slnt\,wght.ttf") format("truetype");
+}
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    background-image: url("data:image/svg+xml;utf8,<svg height='24' viewBox='0 0 24 24' width='30' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5' fill='none' stroke='black' stroke-width='1.5'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-position-y: 50%;
+    border: 1px solid #dfdfdf;
+    border-radius: 2px;
+    padding: 1rem;
+}
+
+.pagination {
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    margin: 1rem 0;
+    border-radius: 1rem;
+}
+
+.pagination li {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #dfdfdf;
+}
+
+.pagination li:hover {
+    background: #dce7ff;
+    color: #0257FD;
+    border: 1px solid #0257FD;
+}
+
+.pagination .active {
+    background: #0257FD;
+    color: #fff;
+    border: 1px solid #0257FD;
+}
+
+.tab-link {
+    white-space: nowrap;
+    border-bottom-width: 2px;
+    border-color: transparent;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    --tw-text-opacity: 1;
+    color: rgba(107, 114, 128, var(--tw-text-opacity));
+}
+
+.tab-link:hover {
+    --tw-text-opacity: 1;
+    color: rgba(55, 65, 81, var(--tw-text-opacity));
+    --tw-border-opacity: 1;
+    border-color: rgba(209, 213, 219, var(--tw-border-opacity));
+}
+
+.tab-link.tab-active {
+    --tw-border-opacity: 1;
+    border-color: rgba(59, 130, 246, var(--tw-border-opacity));
+    --tw-text-opacity: 1;
+    color: rgba(37, 99, 235, var(--tw-text-opacity));
+}
+
+#filter-pills-container::-webkit-scrollbar { 
+    display: none;
+}
+
+.false-bg {
+    background-color:rgba(red, green, blue, 0);
+    background-image: linear-gradient(to left, rgb(255, 255, 255) , rgba(255, 0, 0, 0));
+    z-index: 999;
+}
+
+#main-grid:last-child {
+    border-bottom-width: 0;
+}
+
+.validation-tab {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    padding-top: 1rem;
+    border-color: transparent;
+    padding-bottom: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    --tw-text-opacity: 1;
+    border-bottom-width: 2px;
+    color: rgba(107, 114, 128, var(--tw-text-opacity));
+}
+
+.validation-tab:hover {
+    --tw-text-opacity: 1;
+    color: rgba(55, 65, 81, var(--tw-text-opacity));
+    --tw-border-opacity: 1;
+    border-color: rgba(209, 213, 219, var(--tw-border-opacity));
+    border-bottom-width: 2px;
+}
+
+.validation-tab.validation-tab-active {
+    --tw-border-opacity: 1;
+    border-color: rgba(59, 130, 246, var(--tw-border-opacity));
+    --tw-text-opacity: 1;
+    color: rgba(37, 99, 235, var(--tw-text-opacity));
+    border-bottom-width: 2px;
+}
+
+.skeleton {
+    animation: skeleton-loading 0.8s linear infinite alternate;
+}
+
+.processing {
+    animation: processing-loading 0.8s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: hsl(195, 16%, 85%);
+    }
+
+    100% {
+        background-color: hsl(200, 20%, 95%);
+    }
+}
+
+@keyframes processing-loading {
+    0% {
+        background-color: rgb(239 246 255);
+    }
+
+    100% {
+        background-color: rgb(213, 231, 255);
+    }
+}
+
+.skeleton-text {
+    width: 100%;
+    height: 0.7rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.skeleton-text__body {
+    width: 75%;
+}
+
+.skeleton-footer {
+    width: 30%;
+}
+
+@media screen and (max-width: 800px) {
+    #pdf-container {
+        display: none;
+    }
+}
+
+input[type=checkbox] {
+    width: 17px;
+    height: 17px;
+    border:0.5px solid rgb(169, 173, 180);
+    background: #0257FD;
+    outline: none;
+}
+
+input[type=checkbox]:hover {
+    cursor: pointer;
+}

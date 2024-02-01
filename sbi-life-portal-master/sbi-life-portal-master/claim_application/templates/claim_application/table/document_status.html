@@ -1,0 +1,11 @@
+{% if record.status == 'queued' %}
+    <span class="py-1 text-sm px-1.5 bg-yellow-100 text-yellow-600 rounded-md capitalize" id="{{ record.id }}_status" >{{ record.status }}</span>
+{% elif record.status == 'processing' %}
+    <span class="py-1 text-sm px-1.5 processing text-blue-600 rounded-md capitalize" id="{{ record.id }}_status">{{ record.status }}</span>
+{% elif record.status == 'completed' %}
+    <span class="py-1 text-sm px-1.5 bg-green-100 text-green-600 rounded-md capitalize" id="{{ record.id }}_status">{{ record.status }}</span>
+{% elif record.status == 'deleted' %}
+    <span class="py-1 text-sm px-1.5 bg-red-100 text-red-600 rounded-md capitalize" id="{{ record.id }}_status">{{ record.status }}</span>
+{% elif record.status == 'error' %}
+    <span class="py-1 text-sm px-1.5 bg-red-100 text-red-600 rounded-md capitalize" id="{{ record.id }}_status">{{ record.status }}</span>
+{% endif %}

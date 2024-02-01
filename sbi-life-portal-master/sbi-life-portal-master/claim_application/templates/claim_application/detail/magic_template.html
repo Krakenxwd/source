@@ -1,0 +1,685 @@
+{% extends 'base/base.html' %}
+{% load htmlfilter %}
+{% load static %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+{% block head_title %}
+    Magic Link
+{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" href="{% static 'css/detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/annotation.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="flex h-screen flex-col">
+        <section class="">
+            <div class="flex flex-wrap justify-between gap-2 w-full items-center border-b bg-gray-50 px-5 py-3">
+                <div class="flex items-center gap-3">
+                    <span class="open-hamburger-menu md:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>                      
+                    </span>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-xl font-semibold">Summary</span>
+                        <div class="text-xs md:flex justify-between flex-wrap w-full mx-auto text-center divide-x divide-gray-400">
+                            <div class="flex gap-1 pr-4">
+                                <span class="font-medium">Policy No: </span>
+                                <span class="text-gray-500">
+                                    {% if document.policy_number %}
+                                        {{ document.policy_number }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if document.date_of_intimation %}
+                            <div class="hidden md:flex gap-1 px-2">
+                                <span class="font-medium">Date of Initmation: </span>
+                                <span class="text-gray-500">
+                                    {{ document.date_of_intimation|date:"d/m/Y" }}
+                                </span>
+                                </div>
+                            {% endif %}
+                            {% for claimant in document.claimant_set.all|dictsort:"type"|fetch_only_two %}
+                                {% for claimant_field in claimant.claimant_fields.all %}
+                                    {% if claimant_field.digital_master_field.code == 'name' and claimant_field.value_text %}
+                                        {% if claimant.type == 'Holder' %}
+                                            <div class="hidden lg:!flex gap-1 px-2">
+                                                <span class="font-medium">Name of Life Insured:</span> 
+                                                <span title="{{ claimant_field.value_text }}" class="text-gray-500 w-24 overflow-hidden text-ellipsis whitespace-nowrap">{{ claimant_field.value_text }}</span>
+                                            </div>
+                                        {% else %}
+                                            <div class="hidden lg:!flex gap-1 px-4">
+                                                <span class="font-medium">Name of Nominee:</span>
+                                                <span title="{{ claimant_field.value_text }}" class="text-gray-500 w-24 overflow-hidden text-ellipsis whitespace-nowrap">{{ claimant_field.value_text }}</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% if document.claimant_set.all.count > 2 %}
+                                <span href="" class="underline flex gap-1 px-4 open-policy-entity cursor-pointer text-gray-500 hover:text-black"
+                                    id="open-policy-entity">+{{ document.claimant_set.all.count|add:"-2" }} More</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if document.status in 'completed' %}
+            <div class="bg-white">
+                <div class="overflow-x-auto border-b border-gray-200">
+                    <div class="flex justify-between items-center pr-3">
+                        <nav class="flex gap-1 space-x-4 px-4" aria-label="Tabs">
+                            {% for claimant in document.get_nominees.all|dictsort:"type" %}
+                                <a href="#policy_{{ claimant.type }}_{{ claimant.id }}" data-id="policy_{{ claimant.type }}_{{ claimant.id }}"
+                                class="tab-link flex items-center gap-1.5
+                                        {% if claimant.get_pages %}{% else %}pointer-events-none opacity-60{% endif %}"
+                                aria-current="page">
+                                    <span class="hidden">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-red-500">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                        </svg>
+                                    </span>
+                                    Policy {{ claimant.type }} ID {{ claimant.customer_id }}
+                                </a>
+                            {% endfor %}
+                            {% if document|get_other_page|length > 0 %}
+                                <a href="#policy_other" data-id="policy_other"
+                                    class="tab-link flex items-center gap-1.5
+                                        {% if document|get_other_page|length > 0 %}{% else %}pointer-events-none opacity-60{% endif %}"
+                                aria-current="page">
+                                    <span class="hidden">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-red-500">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                        </svg>
+                                    </span>
+                                    Others
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+        <main class="grid grid-cols-1 lg:grid-cols-7 h-full overflow-y-auto">
+            <section class="h-full col-span-4 overflow-y-auto flex flex-col gap-5 p-5" id="cards_container">
+                {% if document.pages.all|is_claimant_present %}
+                <div class="flex justify-end">
+                    <button class="flex items-center gap-2 text-sm px-3 py-1.5 border rounded-md text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white"
+                            id="expand_collapse_btn">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.3"
+                                     stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/>
+                                </svg>
+                            </span>
+                        <span>Collapse</span>
+                    </button>
+                </div>
+                {% endif %}
+                {% if not document.pages.all|is_claimant_present %}
+                    <div id="empty" class="rounded-md py-10 md:p-10 flex flex-col justify-center text-gray-400 items-center gap-3 text-center">
+                        <div>
+                            <img src="{% static 'images/page.png' %}" alt="" class="w-36 opacity-50">
+                        </div>
+                        <div class="flex px-10 flex-col text-sm justify-center items-center gap-1">
+                            <span class="">No Matching Entities Found.</span>
+                            <span>Upload a new document package <a href="{% url 'claim_application:upload' %}" class="font-medium underline">here.</a></span>
+                        </div>
+                    </div>
+                {% else %}
+                {% for claimant in document.claimant_set.all|dictsort:"type" %}
+        {% if claimant.type in 'Nominee' %}
+        {% for page in claimant.get_pages %}
+            {% with page_id=page.id %}
+                <section class="border rounded-md entity-card" id="policy_{{ claimant.type }}_{{ claimant.id }}">
+                    <div class="flex items-center text-sm hover:bg-blue-50 hover:text-blue-500 cursor-pointer justify-between p-5">
+                        <div class="flex flex-col">
+                            <span class="uppercase font-semibold">{{ page.get_page_label.name }}</span>
+                            <span class="text-gray-400">Policy {{ claimant.type }} {{ claimant.customer_id }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="p-2 rounded-full text-yellow-500 block flex items-center gap-1 font-medium">
+                                <!-- Success or Failed validation score -->
+                                {% with success_score=page|get_page_validation_score:'success' failed_score=page|get_page_validation_score:'failed' %}
+                                    {% if failed_score %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor"
+                                            class="w-6 h-6 text-yellow-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                                    </svg>
+                                    <span>{{ failed_score }}</span>
+                                    {% elif success_score %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"></path>
+                                    </svg>
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
+
+                            <!-- Front Back validation -->
+                            {% if page|if_f_b_validation_available %}
+                            {% with f_page_number=page|get_front_page_number %}
+                                <button data-page="{{ f_page_number }}"
+                                    class="change-page-btn px-3 py-1 flex items-center gap-1 text-xs border rounded text-blue-600 border-blue-600 {% if f_page_number %}{% else %}pointer-events-none{% endif %}"
+                                    id="turn-page-label">
+                                        <span class="">
+                                            F
+                                        </span>
+                                        <span>
+                                            {% if f_page_number %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-green-500">
+                                                    <path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.883l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                                                </svg>
+                                            {% else %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-yellow-500">
+                                                    <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                                </svg>
+                                            {% endif %}
+                                        </span>
+                                </button>
+                            {% endwith %}
+
+                            {% with b_page_number=page|get_back_page_number %}
+                                <button data-page="{{ b_page_number }}"
+                                    class="change-page-btn flex items-center gap-1 px-3 py-1 text-xs border rounded text-blue-600 border-blue-600 {% if b_page_number %}{% else %}pointer-events-none{% endif %}"
+                                    id="turn-page-label">
+                                        <span class="">
+                                            B
+                                        </span>
+                                        <span>
+                                            {% if b_page_number %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-green-500">
+                                                    <path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.883l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                                                </svg>
+                                            {% else %}
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-yellow-500">
+                                                    <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                                </svg>
+                                            {% endif %}
+                                        </span>
+                                </button>
+                            {% endwith %}
+                            {% endif %}
+                            <button class="expand-detail-card-button expand-div-button rounded-full p-2 hover:bg-blue-100 hover:text-blue-600"
+                                    id="expand-card-{{ page_id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" id="svg-{{ page_id }}">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="visible p-0 detail-card card-expanded" id="detail-card-{{ page_id }}">
+                        <div class="flex flex-col gap-5 p-5 text-sm">
+                            <div class="grid grid-cols-6 md:grid-cols-7 items-center justify-center">
+                                <div class=""></div>
+                                <div class="col-start-2 col-span-2 p-3 bg-gray-200 rounded-t-xl font-medium flex items-center">
+                                    SBIL Data
+                                </div>
+                                <div class="col-span-2 p-3 bg-blue-200 rounded-t-xl font-medium flex items-center">
+                                    Extracted Data
+                                </div>
+                                <div class="p-3 bg-gray-100 rounded-t-xl font-medium bg-gray-200 flex items-center">
+                                    Score
+                                </div>
+                                <div class="hidden md:!flex"></div>
+
+                                {% for master_field in page.get_active_fields %}
+                                    {% with data_type=master_field.data_type field_code=master_field.code %}
+                                        {% if field_code not in "full,front,back" %}
+                                        <div class="p-3 border-b h-full text-xs font-medium flex items-center">{{ master_field.name }}</div>
+
+                                        <!-- Claimants Fields (SBIL data) -->
+                                        {% with claimant_field=master_field|get_claimant_field_based_on_master_field:page %}
+                                        {% if claimant_field %}
+                                            <div class="col-start-2 col-span-2 p-3 bg-gray-50 border-b h-full text-xs capitalize flex items-center">
+                                                    {% if claimant_field.text %}
+                                                        {{ claimant_field.text }}{% else %}{% endif %}
+                                                </div>
+                                        {% else %}
+                                            <div class="col-span-2 p-3 bg-gray-50 border-b h-full text-xs capitalize flex items-center">
+                                                </div>
+                                        {% endif %}
+                                        {% endwith %}
+
+                                        <!-- Extracted Data -->
+                                        {% with pagefield=master_field|get_page_field_based_on_master_field:page %}
+                                        {% if pagefield %}
+                                            {% with original_pagefield_page_num=pagefield.original_page_number|format_value_text %}
+                                            <!-- set-active-attr-id use to connect with field-attr-id -->
+                                            <div class="col-span-2 p-3 border-b h-full text-xs bg-blue-50 capitalize flex items-center"
+                                                 set-active-attr-id="pagefield-{{ page.number }}-{{ field_code }}-value" field-attr-id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-value">
+                                                {% if data_type == 'date' %}
+                                                    {{ pagefield.value_date|date:"d/m/Y" }}
+                                                {% elif data_type == 'amount' %}
+                                                    {{ pagefield.value_amount }}
+                                                {% elif data_type == 'boolean' %}
+                                                    {{ pagefield.value_boolean }}
+                                                {% elif data_type == 'image' %}
+                                                    {% with face_url=pagefield|get_image_url %}
+                                                        {% if face_url %}
+                                                            <div>
+                                                                <img src="{{ face_url }}" alt="" class="w-24">
+                                                            </div>
+                                                        {% else %}
+                                                            <div>
+                                                                <img src="{% static 'images/placeholder.jpg' %}"
+                                                                    alt=""
+                                                                    class="w-24">
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                {% elif data_type == 'text' and pagefield.is_multi_line %}
+                                                    {% if pagefield.value_text %}
+                                                        {{ pagefield.value_text }}{% else %}{% endif %}
+                                                {% else %}
+                                                    {{ pagefield.text }}
+                                                {% endif %}
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmin"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmin"
+                                                    value={{ pagefield.w_min }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmax"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmax"
+                                                    value={{ pagefield.w_max }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmin"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmin"
+                                                    value={{ pagefield.h_min }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmax"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmax"
+                                                    value={{ pagefield.h_max }}>
+                                            </div>
+                                            {% endwith %}
+                                        {% else %}
+                                            <div class="col-span-2 p-3 border-b h-full text-xs bg-blue-50 capitalize flex items-center"
+                                                 field-attr-id=""></div>
+                                        {% endif %}
+                                        {% endwith %}
+
+                                        <!-- Score Fields -->
+                                        {% with score_field=master_field|get_score_field_based_on_master_field:page %}
+                                        {% if score_field %}
+                                            <div class="p-3 border-b h-full text-xs font-medium bg-gray-50 flex items-center">
+                                                {{ score_field.score|format_value_text|floatformat:"0" }}
+                                            </div>
+                                        {% else %}
+                                            <div class="p-3 border-b h-full text-xs font-medium bg-gray-50 flex items-center"></div>
+                                        {% endif %}
+                                        {% endwith %}
+
+                                        <div class="p-3 border-b h-full text-xs hidden md:!flex gap-1 items-center">
+
+                                        <!-- Annotation block. -->
+                                        <span class="set-active-item cursor-pointer hover:scale-110" id="pagefield-{{ page.number }}-{{ field_code }}-value" data-item="field">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                                class="w-5 h-5 text-blue-500 self-center">
+                                                <path d="M4.25 2A2.25 2.25 0 002 4.25v2a.75.75 0 001.5 0v-2a.75.75 0 01.75-.75h2a.75.75 0 000-1.5h-2zM13.75 2a.75.75 0 000 1.5h2a.75.75 0 01.75.75v2a.75.75 0 001.5 0v-2A2.25 2.25 0 0015.75 2h-2zM3.5 13.75a.75.75 0 00-1.5 0v2A2.25 2.25 0 004.25 18h2a.75.75 0 000-1.5h-2a.75.75 0 01-.75-.75v-2zM18 13.75a.75.75 0 00-1.5 0v2a.75.75 0 01-.75.75h-2a.75.75 0 000 1.5h2A2.25 2.25 0 0018 15.75v-2zM7 10a3 3 0 116 0 3 3 0 01-6 0z"/>
+                                            </svg>
+                                        </span>
+
+                                        <!-- Success Failed Validation icons -->
+                                        {% with field_validations=master_field|get_field_validation:page %}
+                                            {% if field_validations %}
+                                                {% if field_validations|is_all_mandatory_validation_flag_true %}
+                                                <span class="hover:scale-110">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                                        class="w-6 h-6 text-green-500">
+                                                        <path fill-rule="evenodd"
+                                                            d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                                            clip-rule="evenodd"/>
+                                                    </svg>
+                                                </span>
+                                                {% else %}
+                                                    <span class="hover:scale-110">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-yellow-500">
+                                                            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endwith %}
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            {% endwith %}
+        {% endfor %}
+        {% endif %}
+    {% endfor %}
+
+    <!-- #### Claim Form #### -->
+    {% for page in document.get_claim_form_pages %}
+        {% with page_id=page.id %}
+                <section class="border rounded-md entity-card" id="policy_">
+                    <div class="flex items-center text-sm hover:bg-blue-50 hover:text-blue-500 cursor-pointer justify-between p-5">
+                        <div class="flex flex-col">
+                            <span class="uppercase font-semibold">{{ page.get_page_label.name }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="expand-detail-card-button expand-div-button rounded-full p-2 hover:bg-blue-100 hover:text-blue-600"
+                                    id="expand-card-{{ page_id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" id="svg-{{ page_id }}">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="visible p-0 detail-card card-expanded" id="detail-card-{{ page_id }}">
+                        <div class="flex flex-col gap-5 p-5 text-sm">
+                            <div class="grid grid-cols-7 items-center justify-center">
+                                <div class=""></div>
+                                <div class="col-start-2 col-span-2 p-3 bg-gray-200 rounded-t-xl font-medium flex items-center">
+                                    SBIL Data
+                                </div>
+                                <div class="col-span-2 p-3 bg-blue-200 rounded-t-xl font-medium flex items-center">
+                                    Extracted Data
+                                </div>
+                                <div class="p-3 bg-gray-100 rounded-t-xl font-medium bg-gray-200 flex items-center">
+                                    Score
+                                </div>
+                                <div class=""></div>
+
+                                {% for master_field in page.get_active_fields %}
+                                    {% with data_type=master_field.data_type field_code=master_field.code %}
+                                        {% if field_code not in "full,front,back" %}
+                                        <div class=" p-3 border-b h-full text-xs font-medium flex items-center">{{ master_field.name }}</div>
+
+                                        <!-- Claimants Fields (SBIL data) -->
+                                        <div class="col-span-2 p-3 bg-gray-50 border-b h-full text-xs capitalize flex items-center">
+                                                </div>
+
+                                        <!-- Extracted Data -->
+                                        {% with pagefield=master_field|get_page_field_based_on_master_field:page %}
+                                        {% if pagefield %}
+                                            {% with original_pagefield_page_num=pagefield.original_page_number|format_value_text %}
+                                            <!-- set-active-attr-id use to connect with field-attr-id -->
+                                            <div class="col-span-2 p-3 border-b h-full text-xs bg-blue-50 capitalize flex items-center"
+                                                 set-active-attr-id="pagefield-{{ page.number }}-{{ field_code }}-value" field-attr-id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-value">
+                                                {% if data_type == 'date' %}
+                                                    {{ pagefield.value_date|date:"d/m/Y" }}
+                                                {% elif data_type == 'amount' %}
+                                                    {{ pagefield.value_amount }}
+                                                {% elif data_type == 'boolean' %}
+                                                    {{ pagefield.value_boolean }}
+                                                {% elif data_type == 'image' %}
+                                                    {% with face_url=pagefield|get_image_url %}
+                                                        {% if face_url %}
+                                                            <div>
+                                                                <img src="{{ face_url }}" alt="" class="w-24">
+                                                            </div>
+                                                        {% else %}
+                                                            <div>
+                                                                <img src="{% static 'images/placeholder.jpg' %}"
+                                                                    alt=""
+                                                                    class="w-24">
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                {% elif data_type == 'text' and pagefield.is_multi_line %}
+                                                    {% if pagefield.value_text %}
+                                                        {{ pagefield.value_text }}{% else %}{% endif %}
+                                                {% else %}
+                                                    {{ pagefield.text }}
+                                                {% endif %}
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmin"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmin"
+                                                    value={{ pagefield.w_min }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmax"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmax"
+                                                    value={{ pagefield.w_max }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmin"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmin"
+                                                    value={{ pagefield.h_min }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmax"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmax"
+                                                    value={{ pagefield.h_max }}>
+                                            </div>
+                                            {% endwith %}
+                                        {% else %}
+                                            <div class="col-span-2 p-3 border-b h-full text-xs bg-blue-50 capitalize flex items-center"
+                                                 field-attr-id=""></div>
+                                        {% endif %}
+                                        {% endwith %}
+
+                                        <!-- Score Fields -->
+                                        <div class="p-3 border-b h-full text-xs font-medium bg-gray-50 flex items-center"></div>
+
+                                        <div class="p-3 border-b h-full text-xs flex gap-1 items-center">
+
+                                        <!-- Annotation block. -->
+                                        <span class="set-active-item cursor-pointer hover:scale-110" id="pagefield-{{ page.number }}-{{ field_code }}-value" data-item="field">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                                class="w-5 h-5 text-blue-500 self-center">
+                                                <path d="M4.25 2A2.25 2.25 0 002 4.25v2a.75.75 0 001.5 0v-2a.75.75 0 01.75-.75h2a.75.75 0 000-1.5h-2zM13.75 2a.75.75 0 000 1.5h2a.75.75 0 01.75.75v2a.75.75 0 001.5 0v-2A2.25 2.25 0 0015.75 2h-2zM3.5 13.75a.75.75 0 00-1.5 0v2A2.25 2.25 0 004.25 18h2a.75.75 0 000-1.5h-2a.75.75 0 01-.75-.75v-2zM18 13.75a.75.75 0 00-1.5 0v2a.75.75 0 01-.75.75h-2a.75.75 0 000 1.5h2A2.25 2.25 0 0018 15.75v-2zM7 10a3 3 0 116 0 3 3 0 01-6 0z"/>
+                                            </svg>
+                                        </span>
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            {% endwith %}
+    {% endfor %}
+
+    <!-- ####  Others  #### -->
+    {% for page in document|get_other_page %}
+            {% with page_id=page.id %}
+                <section class="border rounded-md entity-card" id="policy_other">
+                    <div class="flex items-center text-sm hover:bg-blue-50 hover:text-blue-500 cursor-pointer justify-between p-5">
+                        <div class="flex flex-col">
+                            <span class="uppercase font-semibold">{{ page.get_page_label.name }}</span>
+                            <span class="text-gray-400">Other</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="p-2 rounded-full text-yellow-500 block flex items-center gap-1 font-medium">
+                                <!-- Success or Failed validation score -->
+                            </span>
+
+                            <!-- Front Back validation -->
+                            <button class="expand-detail-card-button expand-div-button rounded-full p-2 hover:bg-blue-100 hover:text-blue-600"
+                                    id="expand-card-{{ page_id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" id="svg-{{ page_id }}">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="visible p-0 detail-card card-expanded" id="detail-card-{{ page_id }}">
+                        <div class="flex flex-col gap-5 p-5 text-sm">
+                            <div class="grid grid-cols-7 items-center justify-center">
+                                <div class=""></div>
+                                <div class="col-start-2 col-span-2 p-3 bg-gray-200 rounded-t-xl font-medium flex items-center">
+                                    SBIL Data
+                                </div>
+                                <div class="col-span-2 p-3 bg-blue-200 rounded-t-xl font-medium flex items-center">
+                                    Extracted Data
+                                </div>
+                                <div class="p-3 bg-gray-100 rounded-t-xl font-medium bg-gray-200 flex items-center">
+                                    Score
+                                </div>
+                                <div class=""></div>
+
+                                {% for master_field in page.get_active_fields %}
+                                    {% with data_type=master_field.data_type field_code=master_field.code %}
+                                        {% if field_code not in "full,front,back" %}
+                                        <div class=" p-3 border-b h-full text-xs font-medium flex items-center">{{ master_field.name }}</div>
+
+                                        <!-- Claimants Fields (SBIL data) -->
+
+                                        <div class="col-span-2 p-3 bg-gray-50 border-b h-full text-xs capitalize flex items-center">
+                                            </div>
+
+                                        <!-- Extracted Data -->
+                                        {% with pagefield=master_field|get_page_field_based_on_master_field:page %}
+                                        {% if pagefield %}
+                                            {% with original_pagefield_page_num=pagefield.original_page_number|format_value_text %}
+                                            <!-- set-active-attr-id use to connect with field-attr-id -->
+                                            <div class="col-span-2 p-3 border-b h-full text-xs bg-blue-50 capitalize flex items-center"
+                                                 set-active-attr-id="pagefield-{{ page.number }}-{{ field_code }}-value" field-attr-id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-value">
+                                                {% if data_type == 'date' %}
+                                                    {{ pagefield.value_date|date:"d/m/Y" }}
+                                                {% elif data_type == 'amount' %}
+                                                    {{ pagefield.value_amount }}
+                                                {% elif data_type == 'boolean' %}
+                                                    {{ pagefield.value_boolean }}
+                                                {% elif data_type == 'image' %}
+                                                    {% with face_url=pagefield|get_image_url %}
+                                                        {% if face_url %}
+                                                            <div>
+                                                                <img src="{{ face_url }}" alt="" class="w-24">
+                                                            </div>
+                                                        {% else %}
+                                                            <div>
+                                                                <img src="{% static 'images/placeholder.jpg' %}"
+                                                                    alt=""
+                                                                    class="w-24">
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                {% elif data_type == 'text' and pagefield.is_multi_line %}
+                                                    {% if pagefield.value_text %}
+                                                        {{ pagefield.value_text }}{% else %}{% endif %}
+                                                {% else %}
+                                                    {{ pagefield.text }}
+                                                {% endif %}
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmin"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmin"
+                                                    value={{ pagefield.w_min }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmax"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-wmax"
+                                                    value={{ pagefield.w_max }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmin"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmin"
+                                                    value={{ pagefield.h_min }}>
+                                                <input type="hidden"
+                                                    data-item="hidden"
+                                                    id="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmax"
+                                                    name="pagefield-{{ original_pagefield_page_num }}-{{ field_code }}-hmax"
+                                                    value={{ pagefield.h_max }}>
+                                            </div>
+                                            {% endwith %}
+                                        {% else %}
+                                            <div class="col-span-2 p-3 border-b h-full text-xs bg-blue-50 capitalize flex items-center"
+                                                 field-attr-id=""></div>
+                                        {% endif %}
+                                        {% endwith %}
+
+                                        <!-- Score Fields -->
+                                        <div class="p-3 border-b h-full text-xs font-medium bg-gray-50 flex items-center"></div>
+
+                                        <div class="p-3 border-b h-full text-xs flex gap-1 items-center">
+
+                                        <!-- Annotation block. -->
+                                        <span class="set-active-item cursor-pointer hover:scale-110" id="pagefield-{{ page.number }}-{{ field_code }}-value" data-item="field">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                                class="w-5 h-5 text-blue-500 self-center">
+                                                <path d="M4.25 2A2.25 2.25 0 002 4.25v2a.75.75 0 001.5 0v-2a.75.75 0 01.75-.75h2a.75.75 0 000-1.5h-2zM13.75 2a.75.75 0 000 1.5h2a.75.75 0 01.75.75v2a.75.75 0 001.5 0v-2A2.25 2.25 0 0015.75 2h-2zM3.5 13.75a.75.75 0 00-1.5 0v2A2.25 2.25 0 004.25 18h2a.75.75 0 000-1.5h-2a.75.75 0 01-.75-.75v-2zM18 13.75a.75.75 0 00-1.5 0v2a.75.75 0 01-.75.75h-2a.75.75 0 000 1.5h2A2.25 2.25 0 0018 15.75v-2zM7 10a3 3 0 116 0 3 3 0 01-6 0z"/>
+                                            </svg>
+                                        </span>
+
+                                        <!-- Success Failed Validation icons -->
+                                        </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            {% endwith %}
+        {% endfor %}
+                {% endif %}
+            </section>
+            <section id="pdf-container" class="h-full overflow-y-auto col-span-3 bg-gray-100"></section>
+        </main>
+    </div>
+    <section
+            class="files-slide overflow-y-auto fixed right-0 top-0 w-2/6 shadow-2xl h-screen z-10 bg-white transform transition ease-in-out duration-500 sm:duration-700 translate-x-full"
+            id="files-modal">
+        <div class="flex justify-between items-center p-5 border-b bg-gray-50">
+            <span class="flex gap-2 items-center">
+                <span class="font-medium text-lg">Policy Entities</span>
+            </span>
+            <span class="p-1 rounded-full hover:bg-gray-200 cursor-pointer close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>                      
+            </span>
+        </div>
+        <div id="files-replace-div" class="text-sm p-5 flex flex-col gap-3">
+            {% for claimant in document.claimant_set.all|dictsort:"type" %}
+                <div class="flex flex-col gap-2 text-xs">
+                    {% if claimant.type == 'Holder' %}
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">Policy Holder <span
+                                    class="text-gray-500">#{{ claimant.id }}</span></span>
+                            <div class="grid grid-cols-2 gap-3 border rounded-md p-4">
+                                {% for claimant_field in claimant.claimant_fields.all %}
+                                    <div class="flex flex-col">
+                                        <span class="font-medium capitalize">{{ claimant_field.digital_master_field.code }}</span>
+                                        <span class="capitalize text-gray-600">{{ claimant_field.value_text }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm font-medium">Policy Nominee <span
+                                    class="text-gray-500">#{{ claimant.id }}</span></span>
+                            <div class="grid grid-cols-2 gap-3 border rounded-md p-4">
+                                {% for claimant_field in claimant.claimant_fields.all %}
+                                    <div class="flex flex-col">
+                                        <span class="font-medium capitalize">{{ claimant_field.digital_master_field.code }}</span>
+                                        <span class="capitalize text-gray-600">{{ claimant_field.value_text }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
+{% block javascript %}
+    <script src="{% static 'js/annotation.js' %}"></script>
+    <script src="{% static 'js/claim_application/detail/detail_summary.js' %}" preprocessed-file=""
+            file-url="{% if document.file %}{{ document.file.url|safe }}{% endif %}" document-id="{{ document.id }}"
+            page-num="{{ page_num }}"></script>
+{% endblock %}

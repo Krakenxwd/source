@@ -1,0 +1,54 @@
+{% extends "base/account_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extrastyle %}
+<style>
+	main {
+		background: url("{% static 'images/pattern.png' %}") no-repeat right;
+		background-size: cover;
+	}
+</style>
+{% endblock %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+<main class="h-screen w-screen bg-gray-900 overflow-hidden">
+	<section class="bg-white flex flex-col p-10 gap-5 h-screen sm:w-screen lg:w-1/2 xl:w-2/5 justify-center">
+		<div class="logo-image">
+			<img src="{% static 'images/logo.svg' %}" class="h-12" alt="GLIB Logo">
+		</div>
+		<div class="heading-text flex flex-col gap-1">
+			<span class="text-3xl font-bold">Sign In</span>
+			<p class="text-sm text-gray-500">Sign in to your GLIB account. If you don't have an account, ask your admin for an access request.</p>
+		</div>
+		<form class="login" method="POST" action="{% url 'account_login' %}" id="login-form">
+			{% csrf_token %}
+			<div class="form flex flex-col gap-3">
+				<span class="flex flex-col gap-1">
+					<label for="email" class="font-medium text-sm">Email</label>
+					{% render_field form.login class+="border bg-gray-100 p-3 outline-none rounded-md" placeholder="" %}
+				</span>
+				<span class="flex flex-col gap-1">
+					<label for="password" class="font-medium text-sm">{{ form.password.label }}</label>
+					{% render_field form.password class+="border bg-gray-100 p-3 outline-none rounded-md" placeholder=""%}
+				</span>
+				<div class="forgot-passoword text-right">
+					<a href="{% url 'account_reset_password' %}" class="hover:text-blue-700 font-medium text-sm text-gray-500">Forgot Password?</a>
+				</div>
+			</div>
+			<div class="submit-btn mt-3">
+				<button class="bg-blue-700 w-full p-3 text-white font-medium rounded-md hover:bg-blue-800" id="login-btn">Sign
+					In</button>
+			</div>
+			{% if redirect_field_value %}
+			<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+			{% endif %}
+		</form>
+	</section>
+</main>
+
+{% endblock %}

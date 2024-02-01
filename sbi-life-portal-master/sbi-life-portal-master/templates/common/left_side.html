@@ -1,0 +1,156 @@
+{% load static %}
+{% block extrastyle %}
+{% endblock %}
+<aside class="bg-gray-50 h-full border-r w-16 py-4 aside-menu fixed md:!flex flex-col justify-between text-gray-600 hidden" style="z-index: 123456;">
+    <div class="top-menu flex flex-col gap-2 pt-2">
+        <div class="menu-item text-left flex mb-4 gap-2 justify-center items-center">
+            <img class="h-8 w-auto logo-without-text"
+                src="{% static 'images/only_logo.svg' %}"
+                alt="GLIB">
+            <img class="h-8 w-auto logo-with-text"
+            src="{% static 'images/logo.svg' %}"
+            alt="GLIB">
+        </div>
+        <a href="{% url 'claim_application:list' %}" class="menu-item flex items-center justify-center gap-4 p-1.5 hover:cursor-pointer rounded-md hover:text-blue-700 hover:bg-blue-50 {% if active_tab == 'documents' %} text-blue-700 bg-blue-100 {% endif %}">
+            <span class="">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+                </svg>
+            </span>
+            <span class="menu-item-text text-sm font-medium">Documents</span>
+        </a>
+        <a href="{% url 'claim_application:upload' %}" class="menu-item nested-menu-item-title flex flex-col nested-menu-item mx-auto gap-4 p-1.5 rounded-md hover:font-medium hover:cursor-pointer vendor-nested-menu hover:bg-blue-50 hover:text-blue-700 {% if active_tab == 'upload' %} text-blue-700 bg-blue-100 border {% endif %} hidden">
+            <div class="menu-item-title flex items-center justify-between cursor-pointer">
+                <div class="menu-item-title-text flex items-center gap-4 nested-menu-item-title cursor-pointer">
+                    <span class="">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>                                  
+                    </span>
+                    <span class="menu-item-text text-sm font-medium">Upload</span>
+                </div>
+            </div>
+        </a>
+        <a href="{% url 'claim_application:export' %}" class="menu-item flex justify-center rounded-md items-center gap-4 p-1.5 hover:bg-blue-50 hover:cursor-pointer hover:text-blue-700 {% if active_tab == 'export' %} text-blue-700 bg-blue-100 {% endif %}">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 13.5l3 3m0 0l3-3m-3 3v-6m1.06-4.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                </svg>
+            </span>
+            <span class="menu-item-text text-sm font-medium">Export</span>
+        </a>
+        <a href="{% url 'claim_application:analytics' %}" class="menu-item flex justify-center rounded-md items-center gap-4 p-1.5 hover:bg-blue-50 hover:cursor-pointer hover:text-blue-700 {% if active_tab == 'analytics' %} text-blue-700 bg-blue-100 {% endif %}">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/>
+            </svg>
+            </span>
+            <span class="menu-item-text text-sm font-medium">Analytics</span>
+        </a>
+        {% if request.user.is_superuser %}
+            {% if is_sftp_configured %}
+                <a href="{% url 'glib_sftp:sftp' %}" class="menu-item flex justify-center rounded-md items-center gap-4 p-1.5 hover:bg-blue-50 hover:cursor-pointer hover:text-blue-700 {% if active_tab == 'sftp' %} text-blue-700 bg-blue-100 {% endif %}">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                        </svg>                                   
+                    </span>
+                    <span class="menu-item-text text-sm font-medium">SFTP</span>
+                </a>
+            {% endif %}
+        {% endif %}
+        <div class="menu-item flex flex-col nested-menu-item-settings mx-auto gap-4 rounded-md p-1.5  hover:font-medium hover:cursor-pointer hover:bg-blue-50 hover:text-blue-700 settings-nested-menu {% if active_tab == 'history' %} text-blue-700 bg-blue-100 {% endif %} hidden">
+                <div class="menu-item-title flex items-center justify-between cursor-pointer">
+                    <div class="menu-item-title-text flex items-center gap-4 nested-menu-item-title-settings cursor-pointer">
+                        <span class="">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>                                  
+                        </span>
+                        <span class="menu-item-text text-sm font-medium">History</span>
+                    </div>
+                </div>
+        </div>
+        {% if request.user.is_superuser %}
+        <a href="{% url 'claim_application:settings' %}" class="menu-item flex justify-center rounded-md items-center gap-4 p-1.5 hover:bg-blue-50 hover:cursor-pointer hover:text-blue-700 {% if active_tab == 'settings' %} text-blue-700 bg-blue-100 {% endif %}">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>                                                     
+            </span>
+            <span class="menu-item-text text-sm font-medium">Settings</span>
+        </a>
+        {% endif %}
+    </div>
+    <div class="bottom-menu border-t-2 left-3 py-2 z-20 min-w-max my-2 flex flex-col gap-2" style="z-index: 999;">
+        <div class="menu-item w-full flex items-center justify-center gap-4 rounded-md p-1.5">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </span>
+            <span class="menu-item-text w-full text-sm font-medium">
+                <span class="flex flex-col">
+                    <span class="w-40 overflow-hidden text-ellipsis">{{ request.user }}</span>
+                    <span class="text-xs font-normal">{{ request.user.email }}</span>
+                </span>
+            </span>
+        </div>
+            <a href="{% url 'registration:users' %}" class="menu-item hover:bg-blue-50 hover:text-blue-600 whitespace-nowrap flex items-center justify-center gap-4 rounded-md p-1.5 {% if active_tab == 'users' %} text-blue-700 bg-blue-100 {% endif %}">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                    </svg>                  
+                </span>
+                <div class="menu-item-text text-sm font-medium flex flex-col flex-wrap">
+                    <span class="hover:text-blue-700">SBI Life</span>
+                </div>
+            </a>
+            <span id="open_sign_out_btn" class="menu-item flex whitespace-nowrap items-center justify-center gap-4 rounded-md p-1.5 hover:bg-red-100 hover:text-red-600 hover:cursor-pointer">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-600">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
+                    </svg>
+                </span>
+                <span class="menu-item-text text-sm font-medium">Sign Out</span>
+            </span>
+    </div>
+</aside>
+<section class="h-full backdrop hidden w-full bg-gray-900 opacity-70 fixed" style="z-index: 12345;"></section>
+
+<form method="post" action="{% url 'account_logout' %}" class="text-sm">
+	{% csrf_token %}
+	{% if redirect_field_value %}
+	<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+	{% endif %}
+	<div class="sign_out_container top-0 left-0 fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 left-0 hidden"
+		style="z-index: 123457;">
+		<div class="filter-section shadow-xl w-96 p-5 flex flex-col justify-between gap-3 bg-white rounded-md opacity-100"
+			style="z-index: 123459;">
+			<div class="flex items-center justify-between">
+				<span class="p-2 bg-red-50 w-min rounded-full">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+						stroke="currentColor" class="w-6 h-6 text-red-600">
+						<path stroke-linecap="round" stroke-linejoin="round"
+							d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+					</svg>
+				</span>
+			</div>
+			<span class="flex flex-col gap-2">
+                <span class="font-medium text-black">Sign Out</span>
+			    <span class="text-gray-500">Are you sure you want to sign out of the portal?</span>
+            </span>
+			<div class="flex gap-2 justify-end">
+				<button type="button" class="py-2 px-3 bg-gray-200 rounded-md hover:bg-gray-300 font-medium" id="signout-close-btn">Cancel</button>
+				<button type="submit" class="py-2 px-3 bg-red-600 rounded-md text-white hover:bg-red-700 font-medium">Sign Out</button>
+			</div>
+		</div>
+	</div>
+</form>
+
+{% block extra_js %}
+    <script src="{% static 'js/claim_application/sign_out.js' %}"></script>
+{% endblock %}

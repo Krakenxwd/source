@@ -1,0 +1,50 @@
+{% load static %}
+{% block extrastyle %}
+    <link rel="stylesheet" href="{% static 'css/notification.css' %}">
+{% endblock %}
+<div class="notification-holder fixed top-5 right-5 flex flex-col gap-4"></div>
+{% for message in messages %}
+    {% if message.tags in 'success' %}
+        <section id="success-notification-modal"
+                 class="fixed text-sm shadow-lg top-5 right-5 flex flex-col gap-1 w-96 h-42 p-5 border rounded-md bg-white slide-out transform translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="flex items-center justify-between">
+                <span class="p-2 bg-green-50 w-min rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="w-5 h-5 text-green-500">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+                    </svg>
+                </span>
+                <span id="notification-close-btn" class="p-2 hover:bg-gray-50 w-min rounded-full cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                </span>
+            </div>
+            <div class="font-semibold">Information</div>
+            <div class="text-sm text-gray-500" id="success-msg">{{ message }}</div>
+        </section>
+    {% else %}
+        <section id="failed-notification-modal"
+                 class="fixed text-sm shadow-lg top-5 right-5 flex flex-col gap-1 w-96 h-42 p-5 border rounded-md bg-white slide-out transform translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="flex items-center justify-between">
+                <span class="p-2 bg-red-50 w-min rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="w-5 h-5 text-red-500">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+                    </svg>
+                </span>
+                <span id="failed-notification-close-btn" class="p-2 hover:bg-gray-50 w-min rounded-full cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                </span>
+            </div>
+            <div class="font-semibold">Information</div>
+            <div class="text-sm text-gray-500" id="failed-msg">{{ message }}</div>
+        </section>
+    {% endif %}
+{% endfor %}

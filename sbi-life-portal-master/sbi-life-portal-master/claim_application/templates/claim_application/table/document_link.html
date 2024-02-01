@@ -1,0 +1,9 @@
+{% if request.user.is_superuser %}
+    <a href="{% url 'claim_application:detail.summary' record.id %}" class="font-medium hover:text-blue-500">{{ record.id }}</a>
+{% else %}
+    {% if record.status == 'deleted' %}
+        <span class="font-medium hover:text-gray-800 select-none">{{ record.id }}</span>
+    {% else %}
+        <a href="{% url 'claim_application:detail.summary' record.id %}" class="font-medium hover:text-blue-500">{{ record.id }}</a>
+    {% endif %}
+{% endif %}

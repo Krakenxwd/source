@@ -1,0 +1,50 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block extra_head %}
+    {% endblock %}
+
+    <title>{% block head_title %}{% endblock %}</title>
+
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/moment.min.js' %}"></script>
+    <script src="{% static 'js/daterangepicker.js' %}"></script>
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    {% block headerextrascript %}
+    {%endblock %}
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/daterangepicker.css' %}">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    {% block extrastyle %}
+    {%endblock %}
+</head>
+<body>
+{% block body %}
+        {% include 'base/hamburger_menu.html' %}
+        {% block content %}
+        {% endblock %}
+{% endblock %}
+
+{% block extra_body %}
+{% endblock %}
+
+<!-- Notification -->
+{% include 'common/notification.html' %}
+{% include 'common/form_errors.html' %}
+
+{% block javascript %}
+{% endblock %}
+
+<script src="{% static 'js/left_side.js' %}"></script>
+<script src="{% static 'js/mobile.js' %}"></script>
+<script src="{% static 'js/common/notification_modal.js' %}"></script>
+<script src="{% static 'js/common/form_field_modal.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,418 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+{% block head_title %}
+    Document List
+{% endblock %}
+{% block content %}
+    {% include 'common/left_side.html' with active_tab='documents' %}
+    <main class="p-5 flex flex-col gap-5 max-w-screen md:!ml-16">
+        <section class="overflow-hidden">
+            <div class="flex justify-between items-center">
+                <span class="text-xl font-semibold flex items-center gap-3">
+                    <span class="open-hamburger-menu md:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>                      
+                    </span>
+                    <span>
+                        Dashboard
+                    </span>
+                </span>
+                <a href="{% url 'claim_application:upload' %}" class="hidden">
+                <button class="px-3 py-2 bg-blue-700 text-sm text-white flex gap-2 items-center rounded-md hover:bg-blue-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="hidden md:block font-medium">New Document Package</span>
+                    </button>
+                </a>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-hidden">
+            <a href="{% url 'claim_application:list' %}" class="card bg-white p-4 border flex flex-col gap-3 rounded-md hover:bg-blue-100">
+                <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <span class="p-2 bg-blue-100 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+                            </svg>
+                        </span>
+                        <span class="text-gray-500 font-medium">Total</span>
+                    </span>
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                        </svg>
+                    </span>
+                </div>
+                <div class="text-3xl font-semibold">
+                    <span>{{ total_documents }}</span>
+                </div>
+            </a>
+
+            <div>
+                <a href="/?status=queued" class="card p-4 border flex flex-col gap-3 rounded-md hover:bg-yellow-100 {% if request.GET.status == 'queued' %} bg-yellow-100 {% else %} bg-white {% endif %}">
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2">
+                            <span class="p-2 bg-yellow-100 rounded-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-yellow-700">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </span>
+                            <span class="text-gray-500 font-medium">Queued</span>
+                        </span>
+                            <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="text-3xl font-semibold">
+                        <span id="queued-docs-placeholder">{{ queued_documents }}</span>
+                    </div>
+                </a>
+            </div>
+
+            <div>
+                <a href="/?status=processing" class="card p-4 border flex flex-col gap-3 rounded-md hover:bg-purple-100 {% if request.GET.status == 'processing' %} bg-purple-100 {% else %} bg-white {% endif %}">
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2">
+                            <span class="p-2 bg-purple-100 rounded-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-purple-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </span>
+                            <span class="text-gray-500 font-medium">Processing</span>
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="text-3xl font-semibold">
+                        <span id="processing-docs-placeholder">{{ processing_documents }}</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="card">
+                <a href="/?status=completed" class="p-4 border flex flex-col gap-3 rounded-md hover:bg-green-100 {% if request.GET.status == 'completed' %} bg-green-100 {% else %} bg-white {% endif %}">
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2">
+                            <span class="p-2 bg-green-100 rounded-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
+                            </span>
+                            <span class="text-gray-500 font-medium">Success</span>
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="text-3xl font-semibold">
+                        <span id="success-docs-placeholder">{{ success_documents }}</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="card">
+                <a href="/?status=error" class="p-4 border flex flex-col gap-3 rounded-md hover:bg-red-100 {% if request.GET.status == 'error' %} bg-red-100 {% else %} bg-white {% endif %}">
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2">
+                            <span class="p-2 bg-red-100 rounded-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-600">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                            </span>
+                            <span class="text-gray-500 font-medium">Failed</span>
+                        </span>
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-gray-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="text-3xl font-semibold">
+                        <span id="failed-docs-placeholder">{{ failed_documents }}</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="flex flex-col gap-2 overflow-hidden">
+            <div class="flex flex-col gap-2 md:flex-row justify-between flex-wrap">
+                <div class="flex items-center gap-2">
+                    <button type="button" id="open_filters_modal"
+                        class="flex items-center justify-center gap-2 px-4 py-2 text-sm border rounded-md w-full md:w-min cursor-pointer hover:bg-gray-100 h-full">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                <path
+                                    d="M17 2.75a.75.75 0 00-1.5 0v5.5a.75.75 0 001.5 0v-5.5zM17 15.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM3.75 15a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zM4.5 2.75a.75.75 0 00-1.5 0v5.5a.75.75 0 001.5 0v-5.5zM10 11a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0v-5.5A.75.75 0 0110 11zM10.75 2.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5zM10 6a2 2 0 100 4 2 2 0 000-4zM3.75 10a2 2 0 100 4 2 2 0 000-4zM16.25 10a2 2 0 100 4 2 2 0 000-4z" />
+                            </svg>
+                        </span>
+                        <span class="font-medium">Filters</span>
+                        <span class="text-white p-1 rounded-full bg-blue-600 h-5 w-5 text-xs font-medium flex items-center justify-center hidden"
+                            id="search_filters_count"></span>
+                    </button>
+                    {% if has_filter %}
+                        <a href="{% url 'claim_application:list' %}" class="bg-gray-300 hover:bg-gray-400 px-4 font-medium py-2 rounded-md text-black text-sm">Clear</a>
+                    {% endif %}
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                    <form action="{% url 'claim_application:list' %}" method="GET" class="flex flex-col md:flex-row gap-2 w-full md:w-fit">
+                        <div class="flex flex-grow">
+                            <input type="text" name="search" value="{{ request.GET.search }}" class="px-3 py-2 border text-sm rounded-md outline-none w-full" placeholder="Search..." id="search"
+                                autocomplete="off" required />
+                        </div>
+                        <button class="bg-blue-700 hover:bg-blue-800 flex items-center py-2 justify-center px-4 text-white font-medium text-sm rounded-md" type="submit">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 -ml-1 text-white" fill="currentColor"
+                                viewBox="0 0 512 512">
+                                <path
+                                    d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z" />
+                            </svg>
+                            Search
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="relative flex-grow flex" id="filters-main-container">
+                <div id="filter-pills-container" class="flex overflow-x-auto gap-2 capitalize">
+                </div>
+                <div class="false-bg absolute flex justify-end items-center right-0 w-32 h-full">
+                    <span
+                        class="w-7 h-7 shift-filter-btn flex items-center shadow justify-center p-1 hover:bg-gray-100 cursor-pointer bg-white border text-blue-700 rounded-full hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section class="overflow-x-auto">
+            {% if total_documents > 0 %}
+                <div class="text-sm mb-2 text-gray-500">Showing {{ table.page.start_index }} to {{ table.page.end_index }} of {{ table.paginator.count }} documents</div>
+                <div id="document_table">
+                    {% render_table table %}
+                    {% if has_filter and table.paginator.count == 0 %}
+                        <div id="empty" class="rounded-md py-10 md:p-10 flex flex-col justify-center text-gray-400 items-center gap-3 text-center">
+                            <div>
+                                <img src="{% static 'images/leaf.png' %}" alt="" class="w-36 opacity-40">
+                            </div>
+                            <div class="flex px-10 flex-col text-sm justify-center items-center gap-1">
+                                <span class="font-medium">No records found, matching your query.</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div id="empty" class="rounded-md py-10 md:p-10 flex flex-col justify-center text-gray-400 items-center gap-3 text-center">
+                    <div>
+                        <img src="{% static 'images/upload-file.png' %}" alt="" class="w-36">
+                    </div>
+                    <div class="flex px-10 flex-col text-sm justify-center items-center gap-1">
+                        <span class="">No Document Packages Uploaded.</span>
+                        <span>Upload a new document package <a href="{% url 'claim_application:upload' %}" class="font-medium underline">here.</a></span>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+    <!-- Filters Section -->
+    <div class="filter-container fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 top-0 left-0 hidden" style="z-index: 123457;">
+        <section class="bg-white p-5 rounded-md w-full md:w-2/3 xl:w-2/5">
+            <form action="{% url 'claim_application:list' %}" method="GET" class="flex flex-col gap-3">
+                <div class="filters-heading font-medium flex justify-between items-center">
+                    <span>Filters</span>
+                    <button type="button" id="close_filter_modal_btn" class="hover:bg-gray-100 rounded-full p-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>                                  
+                    </button>
+                </div>
+                <div class="filter">
+                    <div class="filter grid grid-cols-3">
+                        <div class="text-sm whitespace-nowrap px-4 py-2 flex items-center border border-r-0 rounded-l bg-gray-100 font-medium">
+                            Date Range
+                        </div>
+                        <input type="text" autocomplete="off" name="date_range" id="date_range" class="col-span-2 text-sm search-input-filter p-2 outline-none border rounded-l-none rounded-md w-full" placeholder="Select a date range">
+                    </div>
+                </div>
+                <div class="filter">
+                    <div class="filter grid grid-cols-3">
+                        <div class="text-sm whitespace-nowrap px-4 py-2 flex items-center border border-r-0 rounded-l bg-gray-100 font-medium">
+                           Mode
+                        </div>
+                        <div class="col-span-2">
+                            <select name="mode" id="mode" class="px-5 py-2 w-full flex-grow bg-white outline-none border rounded-r-md">
+                                <option value="">----</option>
+                                <option value="web">WEB</option>
+                                <option value="sftp">SFTP</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter">
+                    <div class="filter grid grid-cols-3">
+                        <label for="mode" class="text-sm whitespace-nowrap px-4 py-2 flex items-center border border-r-0 rounded-l bg-gray-100 font-medium">
+                           Status
+                        </label>
+                        <div class="col-span-2">
+                            <select name="status" id="status" class="px-5 w-full py-2 bg-white outline-none border">
+                                <option value="">----</option>
+                                <option value="queued">Queued</option>
+                                <option value="processing">Processing</option>
+                                <option value="completed">Completed</option>
+                                <option value="deleted">Deleted</option>
+                                <option value="error">Error</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter grid grid-cols-3">
+                    <div class="text-sm whitespace-nowrap px-4 py-2 flex items-center border rounded-l bg-gray-100 font-medium">
+                        Policy Number
+                    </div>
+                    <div class="col-span-2">
+                        <input type="text" autocomplete="off" name="policy_no" id="policy_no" class="text-sm search-input-filter p-2 outline-none border border-l-0 rounded-l-none rounded-md w-full" placeholder="Search by policy no.">
+                    </div>
+                </div>
+                <div class="filter grid grid-cols-3">
+                    <div class="text-sm whitespace-nowrap px-4 py-2 flex items-center border rounded-l bg-gray-100 font-medium">
+                        Claimant ID
+                    </div>
+                    <div class="col-span-2">
+                        <input type="text" autocomplete="off" name="claim_id" id="claim_id" class="text-sm search-input-filter p-2 outline-none border border-l-0 rounded-l-none rounded-md w-full" placeholder="Search by claimant ID">
+                    </div>
+                </div>
+                <div class="flex gap-1 justify-end items-center">
+                    {% if has_filter %}
+                        <a href="{% url 'claim_application:list' %}" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-md text-black text-sm">Clear</a>
+                    {% endif %}
+                    <button type="submit" class="bg-blue-700 text-sm font-medium px-4 py-2 hover:bg-blue-800 rounded-md text-white h-min">Search</button>
+                </div>
+            </form>
+        </section>
+    </div>
+    <!-- Batch Actions -->
+    <!-- Delete multi documents container -->
+    <div class="delete-documents-container top-0 left-0 fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 hidden" style="z-index: 123457;">
+        <div class="delete-section shadow-xl w-96 p-5 flex flex-col justify-between gap-3 bg-white rounded-md opacity-100" style="z-index: 123459;">
+            <div class="flex items-center justify-between">
+                <span class="p-2 bg-red-50 w-min rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-600">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                </span>
+            </div>
+            <span class="font-medium text-black">Confirm Deletion?</span>
+            <span class="text-gray-500 text-sm">Are you sure you want to delete selected documents? </span>
+            <div class="flex gap-2 mt-1 items-center justify-end">
+                <button class="py-2 px-3 bg-gray-200 font-medium text-black rounded-md hover:bg-gray-300 text-sm close-delete-documents-container">Cancel</button>
+                <button id="batch-delete-confirm" class="font-medium py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm flex justify-center">Delete</button>
+            </div>
+        </div>
+    </div>
+    <!-- Re Run Documents Actions -->
+    <div class="re-run-documents-container top-0 left-0 fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 hidden" style="z-index: 123457;">
+        <div class="delete-section shadow-xl w-96 p-5 flex flex-col justify-between gap-3 bg-white rounded-md opacity-100" style="z-index: 123459;">
+            <div class="flex items-center justify-between">
+                <span class="p-2 bg-blue-50 text-blue-600 w-min rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>                      
+                </span>
+            </div>
+            <span class="font-medium text-black">Confirm Re Run Documents?</span>
+            <span class="text-gray-500 text-sm">Are you sure you want to re run the selected documents? </span>
+            <div class="flex gap-2 mt-1 items-center justify-end">
+                <button class="py-2 px-3 bg-gray-200 font-medium text-black rounded-md hover:bg-gray-300 text-sm close-re-run-documents-container">Cancel</button>
+                <button id="batch-rerun-documents-confirm" class="font-medium py-2 px-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex justify-center">Re Run</button>
+            </div>
+        </div>
+    </div>
+    <!-- Re run Validations -->
+    <div class="re-run-validations-container top-0 left-0 fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 hidden" style="z-index: 123457;">
+        <div class="delete-section shadow-xl w-96 p-5 flex flex-col justify-between gap-3 bg-white rounded-md opacity-100" style="z-index: 123459;">
+            <div class="flex items-center justify-between">
+                <span class="p-2 bg-blue-50 text-blue-600 w-min rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                    </svg>                                           
+                </span>
+            </div>
+            <span class="font-medium text-black">Confirm Re Run Validations?</span>
+            <span class="text-gray-500 text-sm">Are you sure you want to re run validations on the selected documents? </span>
+            <div class="flex gap-2 mt-1 items-center justify-end">
+                <button class="py-2 px-3 bg-gray-200 font-medium text-black rounded-md hover:bg-gray-300 text-sm close-re-run-validations-container">Cancel</button>
+                <button id="batch-rerun-validation-confirm" class="font-medium py-2 px-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex justify-center">Re Run</button>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-col fixed bottom-5 right-10 gap-2 batch-actions hidden batch-actions-container">
+        <button class="flex text-sm font-medium items-center gap-2 w-14 h-14 rounded-full text-white bg-blue-700 hover:bg-blue-800 flex-grow justify-center open-re-run-documents-container shadow-black">
+            <span class="pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>                                                           
+            </span>   
+        </button>
+        {% if request.user.is_superuser %}
+            <button class="flex text-sm font-medium items-center gap-2 w-14 h-14 rounded-full text-white bg-red-600 hover:bg-red-700 flex-grow justify-center open-delete-documents-container shadow-2xl shadow-black">
+                <span class="pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>                                               
+                </span>   
+            </button>
+        {% endif %}
+        <button class="flex text-sm font-medium text-white items-center gap-2 w-14 h-14 bg-blue-700 hover:bg-blue-800 flex-grow rounded-full justify-center open-re-run-validations-container shadow-black shadow-2xl ">
+            <span class="pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                </svg>                              
+            </span>  
+        </button>
+    </div>
+    {{ queued_docs_list|json_script:"queued_docs_list" }}
+    {{ processing_docs_list|json_script:"processing_docs_list" }}
+{% endblock %}
+{% block javascript %}
+<script>
+    var csrf_token = "{{ csrf_token }}";
+    $(function () {
+        $('#date_range').daterangepicker({
+            locale: {
+                format: 'DD/MM/YYYY hh:mm:ss a'
+            },
+            autoUpdateInput: false,
+            timePicker: true,
+            maxDate: new Date(),
+            minDate: {% if first_file %}
+                        new Date("{{ first_file.created_at|date:'Y-m-d' }} {{ first_file.created_at|time:'h:i:s A' }}")
+                    {% else %}
+                        new Date()
+                    {% endif %},
+        });
+
+        $('input[id=date_range]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY hh:mm:ss a') + ' - ' + picker.endDate.format('DD/MM/YYYY hh:mm:ss a'));
+        });
+        $('input[id=date_range]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+    });
+</script>
+<script src="{% static 'js/claim_application/list/delete_document.js' %}"></script>
+<script src="{% static 'js/claim_application/list/list.js' %}"></script>
+<script src="{% static 'js/claim_application/list/list_filters.js' %}"></script>
+{% endblock %}

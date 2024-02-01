@@ -1,0 +1,5 @@
+<span class="p-2" id="{{ record.id }}_checkbox">
+    {% if record.status in 'completed,error' %}
+        <input type="checkbox" name="checkbox" class="p-1 single-checkbox" attr-id="{{ record.id }}">
+    {% endif %}
+</span>

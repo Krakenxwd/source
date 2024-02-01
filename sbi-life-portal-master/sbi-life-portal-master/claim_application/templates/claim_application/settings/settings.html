@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+{% load htmlfilter %}
+{% load static %}
+{% load widget_tweaks %}
+{% load render_table from django_tables2 %}
+
+{% block head_title %}
+    Settings
+{% endblock %}
+
+
+{% block extrastyle %}
+    <style>
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #f1f5f9;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+{% include 'common/left_side.html' with active_tab='settings' %}
+
+<main class="flex h-screen flex-col md:ml-16">
+    
+    {% include 'claim_application/settings/settings_header.html' %}
+    
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-5 gap-3">
+        <div class="border p-5 flex flex-col gap-3 rounded-md">
+            <div class="flex items-center gap-2">
+                <span class="p-2 bg-blue-50 text-blue-600 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                    </svg>                                           
+                </span>
+                <span class="font-medium">Arrange Page Fields</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <p class="text-xs text-gray-500">View all the available page fields belonging to different document types and change the order in which they appear.</p>
+                <div class="flex justify-end text-sm font-medium">
+                    <button class="py-1.5 px-3 bg-blue-600 rounded-md text-white hover:bg-blue-700" id="open-field-arranger">
+                        Configure
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="border p-5 flex flex-col gap-3 rounded-md">
+            <div class="flex items-center gap-2">
+                <span class="p-2 bg-blue-50 text-blue-600 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
+                    </svg>                                           
+                </span>
+                <span class="font-medium">Change Scoring Threshold</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <p class="text-xs text-gray-500">View all the active field scores of the available fields and change their scoring threshold as per your preference.</p>
+                <div class="flex justify-end text-sm font-medium">
+                    <a href="{% url 'claim_application:settings.field_scores' %}" class="py-1.5 px-3 bg-blue-600 rounded-md text-white hover:bg-blue-700" id="open-field-arranger">
+                        Configure
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<section class="master-field-arranger top-0 left-0 fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 hidden" style="z-index: 9999999999;" id="field-arranger-modal">
+    <section class="bg-white w-full md:w-2/3 m-12 rounded-md p-5 overflow-y-auto flex flex-col gap-5" style="height: calc(100% - 100px);">
+        <div class="col-span-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="p-1 bg-blue-50 text-blue-600 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                    </svg>                      
+                </span>
+                <span class="text-lg font-medium">Arrange Page Fields</span>
+            </div>
+            <span id="close-field-arranger" class="hover:bg-gray-100 cursor-pointer rounded-full p-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>                  
+            </span>
+        </div>
+        <div class="grid grid-cols-3 items-start gap-3 overflow-y-auto">
+            <div class="flex flex-col gap-3 overflow-y-auto">
+                <div class="text-sm font-medium">Page Label Types</div>
+                <div class="float-left h-full">
+                    <ul class="flex flex-col gap-2">
+                        {% for field in master_page_labels %}
+                            <li class="master-page-label p-3 border rounded cursor-pointer flex items-center gap-2 text-sm" hx-get="{% url 'claim_application:htmx.fetch_master_field' field.code %}" hx-target="#temp" hx-trigger="click">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>                                      
+                                </span>
+                                <span>
+                                    {{ field.name }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-span-2 flex flex-col gap-3 mr-2 ">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium">Page Labels</span>
+                    <span class="text-xs text-gray-500">Drag and drop to re-arrange.</span>
+                </div>
+                <ul class="items flex flex-col gap-2" id="temp">
+                    <div class="h-full flex flex-col gap-5 p-20 items-center justify-center">
+                        <img src="{% static 'images/price-tags.png' %}" class="w-20 h-20 opacity-20" alt="">
+                        <p class="text-xs text-gray-400">Select a pagel label to continue.</p>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </section>
+</section>  
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/sortable.js' %}"></script>
+    <script src="{% static 'js/claim_application/settings/settings_field_arranger.js' %}"></script>
+{% endblock %}

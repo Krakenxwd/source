@@ -1,0 +1,5 @@
+{% if record.output_type == 'document' %}
+    <span class="py-1 text-sm px-1.5 bg-cyan-100 text-cyan-600 rounded-md capitalize">Document</span>
+{% elif record.output_type == 'digital_json' %}
+    <span class="py-1 text-sm px-1.5 bg-amber-100 text-amber-600 rounded-md capitalize">Digital JSON</span>
+{% endif %}

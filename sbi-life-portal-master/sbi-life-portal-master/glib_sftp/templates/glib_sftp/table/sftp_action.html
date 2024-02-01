@@ -1,0 +1,32 @@
+<a class="editField relative inline-flex hover:bg-gray-100 rounded-full text-gray-500 text-sm p-1.5 cursor-pointer"
+    href="{% url "glib_sftp:sftp_update" record.id %}">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+        <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+    </svg>      
+</a>
+<a class="editField relative inline-flex hover:bg-gray-100 rounded-full text-gray-500 text-sm p-1.5 cursor-pointer delete-button" attr-id="{{ record.id }}">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+        <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+    </svg>      
+</a>
+
+<div class="delete-container top-0 left-0 fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 hidden" style="z-index: 123457;" id="modal-{{ record.id }}">
+    <form method="post" action="{% url 'glib_sftp:sftp_delete' record.id %}">
+        {% csrf_token %}
+        <div class="delete-section shadow-xl w-96 p-5 flex flex-col justify-between gap-3 bg-white rounded-md opacity-100" style="z-index: 123459;">
+            <div class="flex items-center justify-between">
+                <span class="p-2 bg-red-50 w-min rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-600">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                </span>
+            </div>
+            <span class="font-medium text-black">Confirm Deletion?</span>
+            <span class="text-gray-500">Are you sure you want to delete this SFTP ?</span>
+            <div class="flex gap-2 mt-1 justify-end">
+                <button type="button" class="py-2 px-3 bg-gray-200 text-black rounded-md hover:bg-gray-300" id="close-delete-modal-{{ record.id }}"">Cancel</button>
+                <button type="submit" class="block py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700">Delete</button>
+            </div>
+        </div>
+    </form>
+</div>

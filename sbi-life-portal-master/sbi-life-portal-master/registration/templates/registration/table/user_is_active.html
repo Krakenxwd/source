@@ -1,0 +1,9 @@
+<label class="switch">
+    <input type="checkbox" id="{{record.id}}" name="{{record.id}}"
+           {% if record.is_active %}checked{% endif %}
+           {% if is_disabled or same_group %}
+            disabled
+           {% endif %}
+    >
+    <span class="slider round"></span>
+</label>

@@ -1,0 +1,49 @@
+{% load static %}
+<div id="{{ record.id }}_actions">
+        <span class="flex gap-1">
+        {% if record.status in 'completed,error' %}
+            <a href="{% url 'claim_application:rerun' record.id %}?page={{ request.GET.page }}" class="p-1 rounded-full hover:bg-gray-100" title="Rerun Document">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-500">
+                    <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" />
+                </svg>
+            </a>
+            <span attr-id="{{ record.id }}" class="p-1 delete-button cursor-pointer rounded-full delete-button hover:bg-gray-100" title="Delete Document">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-500 pointer-events-none">
+                    <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd"></path>
+                </svg>
+            </span>
+        {% endif %}
+        {% if record.status == 'completed' %}
+            <a href="{% url 'claim_application:rerun.validation' record.id %}?page={{ request.GET.page }}"
+                class="p-1 rounded-full hover:bg-gray-100 text-gray-500" title="Rerun Validation">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                </svg>
+            </a>
+        {% endif %}
+        </span>
+        
+        
+        
+        {% if record.status in 'completed,error' %}
+            <div class="delete-container top-0 left-0 fixed w-screen h-screen flex justify-center items-center bg-gray-800 bg-opacity-60 hidden" style="z-index: 123457;" id="modal-{{ record.id }}">
+                <div class="delete-section shadow-xl w-96 p-5 flex flex-col justify-between gap-3 bg-white rounded-md opacity-100" style="z-index: 123459;">
+                    <div class="flex items-center justify-between">
+                        <span class="p-2 bg-red-50 w-min rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <span class="font-medium text-black">Confirm Deletion?</span>
+                    <span class="text-gray-500">Are you sure you want to delete document with ID <span class="text-black">{{ record.id }}</span>?</span>
+                    <div class="flex gap-2 mt-1 justify-end">
+                        <button class="py-2 px-3 bg-gray-200 font-medium text-black rounded-md hover:bg-gray-300" id="close-delete-modal-{{ record.id }}"">Cancel</button>
+                        <a href="{% url 'claim_application:delete' record.id %}?page={{ request.GET.page }}" class="block font-medium py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700">Delete</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+</div>

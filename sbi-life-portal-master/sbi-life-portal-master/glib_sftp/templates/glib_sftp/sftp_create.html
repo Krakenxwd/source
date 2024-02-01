@@ -1,0 +1,111 @@
+{% extends 'base/base.html' %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block head_title %}
+    Create SFTP
+{% endblock %}
+{% block left_aside %}
+    {% include 'left_side.html' with active_tab="sftp" %}
+{% endblock %}
+{% block extrastyle %}
+    <style>
+        .select2-container{
+            position: relative;
+            top: 4px;
+        }
+        .select2-selection__rendered {
+            line-height: 35px !important;
+        }
+        .select2-container .select2-selection--single {
+            height: 39px !important;
+        }
+        .select2-selection__arrow {
+            height: 36px !important;
+        }
+        .select2-selection {
+          border-radius: 0px !important;
+            border-color: #dde0e5 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            height: 34px !important;
+        }
+        
+        #switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    {% include 'common/left_side.html' with active_tab='sftp' %}
+    <main class="flex flex-col items-center gap-5 mb-12 max-w-screen md:ml-16">
+        <section class="bg-gray-50 w-full p-5 border-b flex justify-between items-center overflow-hidden">
+            
+            <div class="flex gap-3 items-center">
+                <span class="open-hamburger-menu md:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>                      
+                </span>
+                <div class="flex flex-col">
+                    <span class="font-semibold text-xl">Configure SFTP</span>
+                    <span class="text-xs text-gray-500">Set up a new SFTP configuration for file transfer.</span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'glib_sftp:sftp.event' %}" class="flex px-4 gap-2 items-center py-2 text-sm bg-blue-700 hover:bg-blue-800 text-white rounded-md">
+                    <span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                        </svg>                           
+                    </span>
+                    <span class="hidden md:block font-medium">SFTP Events</span>
+                </a>
+            </div>
+        </section>
+        <section class="flex flex-col gap-3 rounded-md md:border w-full p-5 md:!w-3/4">
+            <span class="text-lg font-semibold">Create a new SFTP entry</span>
+            <form method="post">
+                {% csrf_token %}
+                <div class="bg-white px-4 pt-2 pb-4 sm:p-6 sm:pt-2 sm:pb-5">
+                    <div class="space-y-4 divide-y divide-gray-200">
+                        <div class=" grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
+                            <div class="sm:col-span-6">
+                                <div class="mt-1">
+                                    {% for field in form.visible_fields %}
+                                        <div class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 items-start">
+                                            <div class="text-sm font-medium text-gray-900">{{ field.label }}</div>
+                                            <div class="mt-1 text-sm text-gray-700 sm:col-span-2 sm:mt-0">{{ field }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="sm:col-span-6">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="submit" class="bg-blue-700 text-white py-2 px-4 text-sm font-medium rounded-md hover:bg-blue-800" value="Submit">
+                        Save SFTP Configuration
+                    </button>
+                    <a class="bg-gray-200 py-2 px-4 text-sm font-medium rounded-md hover:bg-gray-200" href="{{ request.META.HTTP_REFERER }}">
+                        <span class="oi oi-x"></span> Cancel
+                    </a>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script nonce="{{request.csp_nonce}}">
+    $(document).ready(function () {
+        $('#id_timezone').select2({
+            placeholder: {
+            id: '',
+            text: '------------'
+          },
+        });
+    })
+    </script>
+{% endblock %}

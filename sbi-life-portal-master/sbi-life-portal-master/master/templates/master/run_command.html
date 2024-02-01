@@ -1,0 +1,97 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block head_title %}
+    Run Management
+{% endblock %}
+{% block extrastyle %}
+    <style>
+        .text-sky-500 {
+            color: #0ea5e9;
+        }
+
+        .text-slate-600 {
+            color: #475569;
+        }
+
+        .bg-slate-200 {
+            background: #e2e8f0;
+        }
+
+        .text-slate-900 {
+            color: #0f172a
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="mt-5 mb-2">
+
+
+        <div class=" align-middle inline-block min-w-full sm:px-6 lg:px-8 py-3 mt-2">
+
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="shadow sm:overflow-hidden sm:rounded-sm">
+                    <div class="bg-gray-50 px-4 py-4 text-left sm:px-6">
+                        <h3 class="text-xl font-semibold leading-6 text-gray-900">Run Management Command</h3>
+                    </div>
+                    <div class="space-y-3 bg-white py-3 px-4 sm:p-6">
+
+                        {# Application #}
+                        <div class="grid grid-cols-12 ">
+                            <div class="col-span-12 sm:col-span-6">
+                                <label for="application"
+                                       class="block text-sm font-medium text-gray-700 mb-1 mt-0 pt-0">Application
+                                    Name</label>
+                                <select id="application" class="js-example-basic-multiple"
+                                        name="application" required>
+                                    <option value="" hidden="hidden"></option>
+                                    {% for application in applications %}
+                                        <option value="{{ application }}">{{ application }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        {# Command #}
+                        <div class="grid grid-cols-12 ">
+                            <div class="col-span-12 sm:col-span-6">
+                                <label for="command"
+                                       class="block text-sm font-medium text-gray-700 mb-1 mt-0 pt-0">Command</label>
+                                <select id="command" class="js-example-basic-multiple w-full"
+                                        name="command" required>
+                                    <option value="" hidden="hidden"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {# Extra fields #}
+                        <div class="grid grid-cols-12 ">
+                            <div class="col-span-12 sm:col-span-6">
+                                <label for="extra-items"
+                                       class="block text-sm font-medium text-gray-700 mb-1 mt-0 pt-0">Extra
+                                    Items</label>
+                                <textarea id="extra-items" name="extra-items" rows="4" cols="50"
+                                          style="border: 1px solid #aaa; border-radius: 4px;">{}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 text-left sm:px-6">
+                        <button type="submit" class="btn btn-success" value="Submit">
+                            Run
+                        </button>
+
+                        <a type="button" class="btn btn-light ml-3" href="{{ request.META.HTTP_REFERER }}">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+ <script src="{% static 'js/master/run_command.js' %}" commands='{{ commands|safe }}'></script>
+{% endblock %}

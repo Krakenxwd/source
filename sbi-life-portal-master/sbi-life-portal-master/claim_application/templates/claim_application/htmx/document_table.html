@@ -1,0 +1,8 @@
+{% load render_table from django_tables2 %}
+
+{% render_table table %}
+
+<span id="htmx-queued-documents-count" class="hidden">{{ document_stats_dict.queued_documents }}</span>
+<span id="htmx-success-documents-count" class="hidden">{{ document_stats_dict.success_documents }}</span>
+<span id="htmx-failed-documents-count" class="hidden">{{ document_stats_dict.failed_documents }}</span>
+<span id="htmx-processing-documents-count" class="hidden">{{ document_stats_dict.processing_documents }}</span>

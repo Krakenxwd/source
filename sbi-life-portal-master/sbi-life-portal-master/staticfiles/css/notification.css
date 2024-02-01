@@ -1,0 +1,7 @@
+.slide-out-slide {
+    transform: translateX(100%);
+}
+
+.slide-hidden {
+    display: none;
+}

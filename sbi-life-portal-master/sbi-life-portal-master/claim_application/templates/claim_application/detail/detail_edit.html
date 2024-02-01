@@ -1,0 +1,156 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load htmlfilter %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" href="{% static 'css/annotation.css' %}">
+{% endblock %}
+
+{% block head_title %}
+    Detail
+{% endblock %}
+
+{% block content %}
+{% include 'common/left_side.html' with active_tab='documents' %}
+    <main class="grid grid-cols-2 ml-16">
+        <section class="h-screen overflow-y-scroll">
+            <div class="flex bg-gray-100 text-sm items-center border-b justify-between px-5 py-3">
+                {% for page in document.pages.all %}
+                    <div class="flex flex-col hidden" id="page-label-{{ page.number }}">
+                        <span class="font-semibold text-sm">{{ page.get_page_label.name}}</span>
+                    </div>
+                {% endfor %}
+                <div class="flex items-center gap-1">
+                    <button type="submit" form="save-details" id="save-btn" class="border flex items-center gap-2 py-1.5 px-3 rounded-md bg-green-500 text-white hover:bg-green-600">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                        </span>
+                        <span>
+                            Save File
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <form method="post" action="{% url 'claim_application:update.document' document.id %}" class="px-3 py-3 flex flex-col" id="save-details">
+                {% csrf_token %}
+                {% for page in document.pages.all %}
+                <div id="page-{{ page.number }}" class="hidden">
+                    <div class="bg-gray-50 text-sm w-full p-3 border border-b-0">Extracted Data</div>
+                    <table class="w-full text-xs">
+                        <caption></caption>
+                        <th></th>
+                        <tr class="border">
+                            <td class="p-3 border-r font-medium">Document Type</td>
+                            <td class="">
+                                <select id="page-{{ page.number }}-{{ page.id }}-value" data-item="page"
+                                                name="page-{{ page.number }}-{{ page.id }}-value" class="min-h-full w-full border-none px-3 outline-none">
+                                    {% for label in labels %}
+                                    <option value="{{ label.id }}" {% if page.get_page_label.id == label.id %}selected{% endif %}>{{ label.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden"
+                                   data-item="hidden"
+                                   id="page-{{ page.number }}-{{ page.id }}-changed"
+                                   name="page-{{ page.number }}-{{ page.id }}-changed"
+                                   value=0>
+                            </td>
+                        </tr>
+                        {% for item in page|get_page_active_fields %}
+                            <tr class="border">
+                                <td class="p-0 border-r font-medium">
+                                    <label for="pagefield-{{ page.number }}-{{ item.master_field.code }}"
+                                           class="block text-xs px-3 py-2">
+                                        {{ item.master_field.name }}
+                                    </label>
+                                </td>
+                                <td class="p-0 m-0 border-0">
+                                    {% if item.master_field.data_type == 'date' %}
+                                        <input type="date"
+                                               name="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                               value="{{ item.value_date|date:"Y-m-d" }}"
+                                               id="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                               data-item="field"
+                                               style="border: none"
+                                               class="block p-3 w-full outline-0.5 focus:outline-blue-300 focus:outline-offset-0 sm:text-xs set-active-item">
+                                    {% elif item.master_field.data_type == 'amount' %}
+                                        <input type="number"
+                                               name="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                               value="{{ item.value_amount }}"
+                                               id="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                               data-item="field"
+                                               style="border: none"
+                                               step="0.01"
+                                               class="block p-3 w-full outline-none sm:text-xs set-active-item focus:outline-blue-300 focus:outline-offset-0"
+                                    {% elif item.master_field.data_type == 'boolean' %}
+                                        <input type="text"
+                                               readonly
+                                               value="{% if item.value_boolean %} Present {% else %} Not Present {% endif %}"
+                                               id="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                               data-item="field"
+                                               style="border: none"
+                                               class="block h-full outline-none p-2 w-full focus:outline-blue-300 focus:outline-offset-0 sm:text-xs set-active-item">
+                                    {% elif item.master_field.data_type == 'text' and item.master_field.is_multi_line %}
+                                        <textarea rows="4"
+                                                  name="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                                  id="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                                  data-item="field"
+                                                  style="border: none"
+                                                  class="shadow-sm p-3 outline-none focus:outline-blue-300 focus:outline-offset-0 block w-full sm:text-xs set-active-item">{% if item.value_text %}{{ item.value_text }}{% else %}{% endif %}</textarea>
+                                    {% elif item.master_field.data_type == 'image' %}
+                                        {% if item.value_image %}
+                                            <img src="data:image/png;base64, {{ item.value_image }}" width="125px"
+                                                 alt="{{ item.master_field.name }}"/>
+                                        {% endif %}
+                                    {% else %}
+                                        <input type="text"
+                                               name="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                               value="{{ item.value_text|format_value_text }}"
+                                               id="pagefield-{{ page.number }}-{{ item.master_field.code }}-value"
+                                               data-item="field"
+                                               style="border: none"
+                                               class="block p-3 w-full outline-none focus:outline-blue-300 focus:outline-offset-0 sm:text-xs set-active-item">
+                                    {% endif %}
+                                    <input type="hidden"
+                                           data-item="hidden"
+                                           id="pagefield-{{ page.number }}-{{ item.master_field.code }}-wmin"
+                                           name="pagefield-{{ page.number }}-{{ item.master_field.code }}-wmin"
+                                           value={{ item.w_min }}>
+                                    <input type="hidden"
+                                           data-item="hidden"
+                                           id="pagefield-{{ page.number }}-{{ item.master_field.code }}-wmax"
+                                           name="pagefield-{{ page.number }}-{{ item.master_field.code }}-wmax"
+                                           value={{ item.w_max }}>
+                                    <input type="hidden"
+                                           data-item="hidden"
+                                           id="pagefield-{{ page.number }}-{{ item.master_field.code }}-hmin"
+                                           name="pagefield-{{ page.number }}-{{ item.master_field.code }}-hmin"
+                                           value={{ item.h_min }}>
+                                    <input type="hidden"
+                                           data-item="hidden"
+                                           id="pagefield-{{ page.number }}-{{ item.master_field.code }}-hmax"
+                                           name="pagefield-{{ page.number }}-{{ item.master_field.code }}-hmax"
+                                           value={{ item.h_max }}>
+                                    <input type="hidden"
+                                           data-item="hidden"
+                                           id="pagefield-{{ page.number }}-{{ item.master_field.code }}-changed"
+                                           name="pagefield-{{ page.number }}-{{ item.master_field.code }}-changed"
+                                           value=0>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% endfor %}
+            </form>
+        </section>
+        <section id="pdf-container" class="h-screen max-h-screen bg-gray-100"></section>
+    </main>
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/annotation.js' %}"></script>
+    <script src="{% static 'js/claim_application/detail/detail_edit.js' %}" preprocessed-file=""
+            file-url="{{ document.file.url|safe }}" document-id="{{document.id}}" page-num="{{page_num}}"></script>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% if record.file_type == 'excel' %}
+    <span class="py-1 text-sm px-1.5 bg-green-100 text-green-600 rounded-md capitalize">{{ record.file_type }}</span>
+{% elif record.file_type == 'csv' %}
+    <span class="py-1 text-sm px-1.5 bg-purple-100 text-purple-600 rounded-md capitalize">{{ record.file_type }}</span>
+{% endif %}
